@@ -1,0 +1,16 @@
+:root {
+  --ink: #0c0b2e;
+  --violet: #24205e;
+  --violet-soft: #3a3479;
+  --moon: #f7f3ff;
+  --lime: #c9ff4a;
+  --mineral: #ff779c;
+  --mist: #aaa6c5;
+  --danger: #ff6b6b;
+  --radius-sm: 0.75rem;
+  --radius-md: 1.5rem;
+  --radius-pill: 999px;
+  --content: min(1180px, calc(100vw - 2rem));
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-ui: Inter, Arial, sans-serif;
+}
