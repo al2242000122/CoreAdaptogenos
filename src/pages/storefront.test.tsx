@@ -3,9 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { App } from '../app/App';
 import { CartProvider } from '../cart/CartContext';
+import { CART_STORAGE_KEY } from '../cart/storage';
 
-function renderTestApp(route: string) {
+function renderTestApp(route: string, items: { productId: string; quantity: number }[] = []) {
   localStorage.clear();
+  if (items.length > 0) {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items }));
+  }
   return render(
     <MemoryRouter initialEntries={[route]}>
       <CartProvider>
@@ -99,6 +103,19 @@ it('prevents a misleading add acknowledgement when the cart limit is reached', a
     screen.getByRole('button', { name: /agregar al carrito/i }),
   ).toBeDisabled();
   expect(screen.getByText(/límite de 20/i, { selector: '.cart-toast' })).toBeInTheDocument();
+});
+
+it('explains a disabled add control when persisted items already reach the limit', async () => {
+  renderTestApp('/producto/orbita-01', [{ productId: 'orbita-01', quantity: 20 }]);
+
+  const addButton = await screen.findByRole('button', { name: /agregar al carrito/i });
+
+  expect(addButton).toBeDisabled();
+  expect(addButton).toHaveAttribute('aria-describedby', 'product-capacity-note');
+  expect(screen.getByText(/alcanzaste el límite de 20/i)).toHaveAttribute(
+    'id',
+    'product-capacity-note',
+  );
 });
 
 it('limits quantity choices to the remaining cart capacity after an addition', async () => {

@@ -102,10 +102,20 @@ function ProductDetail({ slug }: { slug: string }) {
                 ))}
               </select>
             </label>
-            <button className="button-primary" type="submit" disabled={atLimit}>
+            <button
+              className="button-primary"
+              type="submit"
+              disabled={atLimit}
+              aria-describedby={atLimit ? 'product-capacity-note' : undefined}
+            >
               Agregar al carrito <span aria-hidden="true">+</span>
             </button>
           </form>
+          {atLimit && (
+            <p className="added-message" id="product-capacity-note">
+              Alcanzaste el límite de 20 unidades de esta fórmula en tu carrito.
+            </p>
+          )}
           {storageWarning && <p role="alert">{storageWarning}</p>}
           <div className="composition">
             <h2>Composición</h2>
