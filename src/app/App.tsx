@@ -4,8 +4,10 @@ import { SiteFooter } from '../components/layout/SiteFooter';
 import { HomePage } from '../pages/HomePage';
 import { ShopPage } from '../pages/ShopPage';
 import { ProductPage } from '../pages/ProductPage';
+import { CartPage } from '../pages/CartPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import '../styles/storefront.css';
+import '../styles/cart.css';
 
 type PlaceholderPageProps = {
   description: string;
@@ -54,15 +56,7 @@ export function App() {
               />
             }
           />
-          <Route
-            path="/carrito"
-            element={
-              <PlaceholderPage
-                title="Carrito"
-                description="Revisa las fórmulas que elegiste."
-              />
-            }
-          />
+          <Route path="/carrito" element={<CartPage />} />
           <Route
             path="/checkout"
             element={
