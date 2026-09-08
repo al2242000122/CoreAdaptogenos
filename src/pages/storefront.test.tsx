@@ -28,6 +28,13 @@ it('moves from the catalog to a product and adds it to the cart', async () => {
   ).toBeInTheDocument();
 });
 
+it('includes the complete visible product link label in its accessible name', async () => {
+  renderTestApp('/tienda');
+  const productLink = await screen.findByRole('link', { name: /órbita 01/i });
+  expect(productLink).toHaveTextContent('Explorar fórmula');
+  expect(productLink).toHaveAccessibleName('Explorar fórmula Órbita 01');
+});
+
 it('combines accessible format and moment filters and can clear the moment', async () => {
   const user = userEvent.setup();
   renderTestApp('/tienda?momento=noche');
@@ -90,6 +97,28 @@ it('prevents a misleading add acknowledgement when the cart limit is reached', a
     screen.getByRole('button', { name: /agregar al carrito/i }),
   ).toBeDisabled();
   expect(screen.getByRole('status')).toHaveTextContent(/límite de 20/i);
+});
+
+it('limits quantity choices to the remaining cart capacity after an addition', async () => {
+  const user = userEvent.setup();
+  renderTestApp('/producto/orbita-01');
+  await screen.findByRole('heading', { name: /órbita 01/i });
+  const quantity = screen.getByLabelText('Cantidad');
+  await user.selectOptions(quantity, '19');
+  await user.click(screen.getByRole('button', { name: /agregar al carrito/i }));
+  expect(
+    within(quantity)
+      .getAllByRole('option')
+      .map((option) => option.getAttribute('value')),
+  ).toEqual(['1']);
+  expect(quantity).toHaveValue('1');
+  await user.click(screen.getByRole('button', { name: /agregar al carrito/i }));
+  expect(
+    screen.getByRole('link', { name: /carrito, 20 productos/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: /agregar al carrito/i }),
+  ).toBeDisabled();
 });
 
 it('links the home ritual moments to a filtered catalog', async () => {

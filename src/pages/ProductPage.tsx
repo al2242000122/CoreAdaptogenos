@@ -45,9 +45,13 @@ function ProductDetail({ slug }: { slug: string }) {
       </p>
     );
   if (!product) return <NotFoundPage />;
-  const atLimit =
-    (items.find((item) => item.productId === product.id)?.quantity ?? 0) >=
-    MAX_PRODUCT_QUANTITY;
+  const remainingCapacity = Math.max(
+    0,
+    MAX_PRODUCT_QUANTITY -
+      (items.find((item) => item.productId === product.id)?.quantity ?? 0),
+  );
+  const atLimit = remainingCapacity === 0;
+  const selectedQuantity = Math.min(quantity, remainingCapacity);
   return (
     <div className="product-page">
       <Link className="product-back" to="/tienda">
@@ -78,7 +82,7 @@ function ProductDetail({ slug }: { slug: string }) {
             onSubmit={(event) => {
               event.preventDefault();
               if (atLimit) return;
-              add(product.id, quantity);
+              add(product.id, selectedQuantity);
               setAdded(true);
             }}
           >
@@ -86,14 +90,15 @@ function ProductDetail({ slug }: { slug: string }) {
               Cantidad
               <select
                 id="product-quantity"
-                value={quantity}
+                value={selectedQuantity}
                 disabled={atLimit}
                 onChange={(event) => {
                   setQuantity(Number(event.target.value));
                   setAdded(false);
                 }}
               >
-                {Array.from({ length: MAX_PRODUCT_QUANTITY }, (_, index) => (
+                {atLimit && <option value={0}>0</option>}
+                {Array.from({ length: remainingCapacity }, (_, index) => (
                   <option key={index + 1} value={index + 1}>
                     {index + 1}
                   </option>

@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
       <Link
         className="product-card__link"
         to={`/producto/${product.slug}`}
-        aria-label={`Explorar ${product.name}`}
+        aria-label={`Explorar fórmula ${product.name}`}
       >
         Explorar fórmula <span aria-hidden="true">↗</span>
       </Link>
