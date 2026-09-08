@@ -133,6 +133,15 @@
   font-size: 0.7rem;
 }
 
+.cart-unavailable {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-left: 2px solid var(--mineral);
+  color: var(--mist);
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
 .cart-summary {
   position: sticky;
   top: 1rem;

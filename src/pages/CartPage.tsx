@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AddToCartToast } from '../components/cart/AddToCartToast';
 import { CartLine } from '../components/cart/CartLine';
 import { formatPrice } from '../components/product/ProductCard';
 import { useCart } from '../cart/CartContext';
@@ -11,7 +10,6 @@ export function CartPage() {
   const { items, subtotal, setQuantity, remove, storageWarning } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     let isCurrent = true;
@@ -44,19 +42,15 @@ export function CartPage() {
     return product ? [{ product, quantity: item.quantity }] : [];
   });
   const isEmpty = items.length === 0;
+  const unavailableItemCount = items.length - lines.length;
+  const canCheckout = lines.length > 0;
 
   const updateQuantity = (product: Product, quantity: number) => {
-    setQuantity(product.id, quantity);
-    setMessage(
-      quantity === 0
-        ? `${product.name} se eliminó de tu carrito.`
-        : `${product.name}: ${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} en tu carrito.`,
-    );
+    setQuantity(product.id, quantity, product.name);
   };
 
   const removeLine = (product: Product) => {
-    remove(product.id);
-    setMessage(`${product.name} se eliminó de tu carrito.`);
+    remove(product.id, product.name);
   };
 
   return (
@@ -80,15 +74,24 @@ export function CartPage() {
               Reuniendo tus fórmulas…
             </p>
           ) : (
-            lines.map(({ product, quantity }) => (
-              <CartLine
-                key={product.id}
-                product={product}
-                quantity={quantity}
-                onQuantityChange={(nextQuantity) => updateQuantity(product, nextQuantity)}
-                onRemove={() => removeLine(product)}
-              />
-            ))
+            <>
+              {lines.map(({ product, quantity }) => (
+                <CartLine
+                  key={product.id}
+                  product={product}
+                  quantity={quantity}
+                  onQuantityChange={(nextQuantity) => updateQuantity(product, nextQuantity)}
+                  onRemove={() => removeLine(product)}
+                />
+              ))}
+              {unavailableItemCount > 0 && (
+                <p className="cart-unavailable" role="alert">
+                  {unavailableItemCount === 1
+                    ? 'Una fórmula ya no está disponible en el catálogo.'
+                    : `${unavailableItemCount} fórmulas ya no están disponibles en el catálogo.`}
+                </p>
+              )}
+            </>
           )}
         </section>
 
@@ -101,7 +104,7 @@ export function CartPage() {
             </strong>
           </div>
           <p>El envío se confirma después, según el destino y la forma de pedido.</p>
-          {!isEmpty && (
+          {canCheckout && (
             <Link className="button-primary" to="/checkout">
               Elegir cómo pedir <span aria-hidden="true">→</span>
             </Link>
@@ -110,7 +113,6 @@ export function CartPage() {
         </aside>
       </div>
 
-      <AddToCartToast message={message} />
     </div>
   );
 }

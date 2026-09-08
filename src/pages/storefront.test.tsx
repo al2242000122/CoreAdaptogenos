@@ -74,7 +74,9 @@ it('uses the chosen quantity and exposes composition and demonstrative lot', asy
   expect(
     screen.getByRole('link', { name: /carrito, 3 productos/i }),
   ).toBeInTheDocument();
-  expect(screen.getByRole('status')).toHaveTextContent(/agregad/i);
+  expect(
+    screen.getByText(/órbita 01 se agregó a tu carrito/i, { selector: '.cart-toast' }),
+  ).toHaveAttribute('aria-live', 'polite');
 });
 
 it('offers catalog recovery for unknown product slugs', async () => {
@@ -96,7 +98,7 @@ it('prevents a misleading add acknowledgement when the cart limit is reached', a
   expect(
     screen.getByRole('button', { name: /agregar al carrito/i }),
   ).toBeDisabled();
-  expect(screen.getByRole('status')).toHaveTextContent(/límite de 20/i);
+  expect(screen.getByText(/límite de 20/i, { selector: '.cart-toast' })).toBeInTheDocument();
 });
 
 it('limits quantity choices to the remaining cart capacity after an addition', async () => {

@@ -13,7 +13,6 @@ function ProductDetail({ slug }: { slug: string }) {
   const [product, setProduct] = useState<Product | null | undefined>(null);
   const [failed, setFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
   const { add, items, storageWarning } = useCart();
   useEffect(() => {
     let current = true;
@@ -82,8 +81,7 @@ function ProductDetail({ slug }: { slug: string }) {
             onSubmit={(event) => {
               event.preventDefault();
               if (atLimit) return;
-              add(product.id, selectedQuantity);
-              setAdded(true);
+              add(product.id, selectedQuantity, product.name);
             }}
           >
             <label htmlFor="product-quantity">
@@ -94,7 +92,6 @@ function ProductDetail({ slug }: { slug: string }) {
                 disabled={atLimit}
                 onChange={(event) => {
                   setQuantity(Number(event.target.value));
-                  setAdded(false);
                 }}
               >
                 {atLimit && <option value={0}>0</option>}
@@ -109,13 +106,6 @@ function ProductDetail({ slug }: { slug: string }) {
               Agregar al carrito <span aria-hidden="true">+</span>
             </button>
           </form>
-          <p className="added-message" role="status">
-            {atLimit
-              ? 'Alcanzaste el límite de 20 unidades de esta fórmula en tu carrito.'
-              : added
-                ? 'Fórmula agregada a tu carrito.'
-                : ''}
-          </p>
           {storageWarning && <p role="alert">{storageWarning}</p>}
           <div className="composition">
             <h2>Composición</h2>

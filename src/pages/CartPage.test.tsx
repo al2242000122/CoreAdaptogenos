@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { App } from '../app/App';
@@ -30,14 +30,40 @@ it('updates quantity, removes a line, and exposes checkout', async () => {
   );
 
   expect(screen.getByText('2', { selector: '[data-quantity]' })).toBeInTheDocument();
+  expect(
+    within(screen.getByRole('complementary', { name: /resumen del carrito/i })).getByText(
+      /\$1,560/,
+    ),
+  ).toBeInTheDocument();
+  expect(screen.getByText(/el envío se confirma después/i)).toBeInTheDocument();
+  expect(
+    screen.getByText(/órbita 01: 2 unidades/i, { selector: '.cart-toast' }),
+  ).toHaveAttribute('aria-live', 'polite');
   expect(screen.getByRole('link', { name: /elegir cómo pedir/i })).toHaveAttribute(
     'href',
     '/checkout',
   );
 
   await user.click(
+    screen.getByRole('button', { name: /disminuir órbita 01/i }),
+  );
+
+  expect(screen.getByText('1', { selector: '[data-quantity]' })).toBeInTheDocument();
+
+  await user.click(
     screen.getByRole('button', { name: /eliminar órbita 01/i }),
   );
 
   expect(screen.getByText(/tu carrito está en pausa/i)).toBeInTheDocument();
+});
+
+it('blocks checkout and explains unavailable persisted items', async () => {
+  renderCartWithItem('formula-retirada', 1);
+
+  expect(
+    await screen.findByText(/ya no está disponible en el catálogo/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole('link', { name: /elegir cómo pedir/i }),
+  ).not.toBeInTheDocument();
 });

@@ -6,6 +6,8 @@ import { ShopPage } from '../pages/ShopPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { AddToCartToast } from '../components/cart/AddToCartToast';
+import { useCart } from '../cart/CartContext';
 import '../styles/storefront.css';
 import '../styles/cart.css';
 
@@ -22,6 +24,11 @@ function PlaceholderPage({ description, title }: PlaceholderPageProps) {
       <p>{description}</p>
     </section>
   );
+}
+
+function CartFeedback() {
+  const { announcement } = useCart();
+  return <AddToCartToast message={announcement} />;
 }
 
 export function App() {
@@ -77,6 +84,7 @@ export function App() {
           />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <CartFeedback />
       </main>
 
       <SiteFooter />
