@@ -1,5 +1,5 @@
 import type { CartItem, CartState } from './types';
-import { MAX_PRODUCT_QUANTITY } from './constants';
+import { MAX_PRODUCT_QUANTITY, MIN_PRODUCT_QUANTITY } from './constants';
 
 export const CART_STORAGE_KEY = 'coreadaptogenos-cart';
 
@@ -15,7 +15,7 @@ const isCartItem = (value: unknown): value is CartItem => {
     typeof productId === 'string' &&
     typeof quantity === 'number' &&
     Number.isInteger(quantity) &&
-    quantity >= 1 &&
+    quantity >= MIN_PRODUCT_QUANTITY &&
     quantity <= MAX_PRODUCT_QUANTITY
   );
 };

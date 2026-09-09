@@ -9,4 +9,5 @@ it('ships without an active WhatsApp destination and documents explicit verifica
 
   expect(envExample).toMatch(/^VITE_WHATSAPP_NUMBER=\s*$/m);
   expect(readme).toMatch(/configura explícitamente.*número.*verificado/i);
+  expect(readme).toMatch(/prototipo no (?:los )?guarda ni los transmite.*navegador puede conservar/i);
 });

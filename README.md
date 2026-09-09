@@ -28,7 +28,7 @@ La compilación genera `dist/`. El servidor de destino debe devolver `index.html
 - `LocalCommerceProvider` es exclusivamente de demostración. Las vistas consumen `commerce`, definido en `src/commerce/CommerceProvider.ts`, a través de la interfaz de `src/commerce/types.ts`.
 - El carrito guarda únicamente identificadores y cantidades en la clave `coreadaptogenos-cart` de `localStorage`. Valida los datos al cargar y continúa en memoria si falla el almacenamiento. Puede vaciarse desde el carrito.
 - `VITE_WHATSAPP_NUMBER` es público y viene vacío. Configura explícitamente un número autorizado y verificado del negocio (10–15 dígitos, con código de país) antes de habilitar el enlace externo. Si falta o no cumple el formato, la llamada a la acción permanece oculta y solo se ofrece “Copiar pedido”. El sitio muestra el resumen antes de abrir WhatsApp; la persona decide si envía el mensaje.
-- “Pago en línea” es una simulación: utiliza datos ficticios. No pide tarjetas ni transmite contacto, dirección, pedido o pago. Los datos del formulario viven en memoria; recargar la confirmación no acredita una compra. No hay envío, impuestos ni correos reales.
+- “Pago en línea” es una simulación: utiliza datos ficticios. El prototipo no los guarda ni los transmite y no pide tarjetas. Aun con `autocomplete="off"`, el navegador puede conservar datos del formulario en su historial según su configuración. Recargar la confirmación no acredita una compra. No hay envío, impuestos ni correos reales.
 - Nosotros y Diario son contenido de muestra. La historia, el proceso, los textos comerciales y cualquier texto legal necesitan revisión profesional antes de una publicación comercial.
 
 ## Rutas

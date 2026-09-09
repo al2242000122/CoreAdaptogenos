@@ -27,6 +27,10 @@ it.each([
   '52+15512345678',
   '++5215512345678',
   '+52.15512345678',
+  '55)(1234--5678',
+  '55  1234 5678',
+  '55--1234-5678',
+  '+52 (55 1234-5678',
 ])('rejects an unusable phone: %s', (phone) => {
   expect(() => buildWhatsAppUrl(phone, 'pedido')).toThrow('WhatsApp no configurado');
 });

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { commerce } from '../commerce/CommerceProvider';
 import type { Product } from '../commerce/types';
 import { cartReducer } from './cartReducer';
@@ -14,6 +14,9 @@ interface CartContextValue {
   subtotal: number;
   storageWarning: string | null;
   announcement: string;
+  products: Product[];
+  catalogStatus: 'loading' | 'ready' | 'error';
+  retryCatalog: () => void;
   add: (product: CartProduct, quantity?: number) => void;
   setQuantity: (product: CartProduct, quantity: number) => void;
   remove: (product: CartProduct) => void;
@@ -23,22 +26,29 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export const CartProvider = ({ children }: React.PropsWithChildren) => {
   const [state, dispatch] = useReducer(cartReducer, undefined, loadCart);
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const [products, setProducts] = useState<Product[]>([]);
+  const [catalogStatus, setCatalogStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [catalogAttempt, setCatalogAttempt] = useState(0);
   const [storageWarning, setStorageWarning] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   useEffect(() => {
     let isCurrent = true;
+    setCatalogStatus('loading');
 
     void commerce.listProducts().then(
       (nextProducts) => {
         if (isCurrent) {
           setProducts(nextProducts);
+          setCatalogStatus('ready');
         }
       },
       () => {
         if (isCurrent) {
           setProducts([]);
+          setCatalogStatus('error');
         }
       },
     );
@@ -46,6 +56,10 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
     return () => {
       isCurrent = false;
     };
+  }, [catalogAttempt]);
+
+  const retryCatalog = useCallback(() => {
+    setCatalogAttempt((attempt) => attempt + 1);
   }, []);
 
   useEffect(() => {
@@ -71,12 +85,18 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
       subtotal,
       storageWarning,
       announcement,
+      products,
+      catalogStatus,
+      retryCatalog,
       add: (product, quantity = 1) => {
         const normalizedQuantity = normalizeProductQuantity(quantity);
-        const currentQuantity =
-          state.items.find((item) => item.productId === product.id)?.quantity ?? 0;
-        const resultingQuantity = normalizeProductQuantity(currentQuantity + normalizedQuantity);
-        dispatch({ type: 'add', productId: product.id, quantity: normalizedQuantity });
+        const action = { type: 'add', productId: product.id, quantity: normalizedQuantity } as const;
+        const nextState = cartReducer(stateRef.current, action);
+        stateRef.current = nextState;
+        dispatch(action);
+        const resultingQuantity = nextState.items.find(
+          (item) => item.productId === product.id,
+        )!.quantity;
         setAnnouncement(
           resultingQuantity >= MAX_PRODUCT_QUANTITY
             ? `${product.name} se agregó a tu carrito. Ahora tienes ${MAX_PRODUCT_QUANTITY} unidades. Alcanzaste el límite de ${MAX_PRODUCT_QUANTITY} unidades de esta fórmula.`
@@ -85,7 +105,9 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
       },
       setQuantity: (product, quantity) => {
         const normalizedQuantity = quantity === 0 ? 0 : normalizeProductQuantity(quantity);
-        dispatch({ type: 'setQuantity', productId: product.id, quantity: normalizedQuantity });
+        const action = { type: 'setQuantity', productId: product.id, quantity: normalizedQuantity } as const;
+        stateRef.current = cartReducer(stateRef.current, action);
+        dispatch(action);
         setAnnouncement(
           normalizedQuantity === 0
             ? `${product.name} se eliminó de tu carrito.`
@@ -93,11 +115,13 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
         );
       },
       remove: (product) => {
-        dispatch({ type: 'remove', productId: product.id });
+        const action = { type: 'remove', productId: product.id } as const;
+        stateRef.current = cartReducer(stateRef.current, action);
+        dispatch(action);
         setAnnouncement(`${product.name} se eliminó de tu carrito.`);
       },
     }),
-    [announcement, count, state.items, storageWarning, subtotal],
+    [announcement, catalogStatus, count, products, retryCatalog, state.items, storageWarning, subtotal],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

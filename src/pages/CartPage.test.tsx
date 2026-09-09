@@ -96,14 +96,21 @@ it('blocks checkout when only part of the cart is unavailable', async () => {
 
 it('shows retry instead of destructive removal when the catalog request fails', async () => {
   const user = userEvent.setup();
-  vi.spyOn(commerce, 'listProducts')
-    .mockRejectedValueOnce(new Error('offline'))
-    .mockRejectedValueOnce(new Error('offline'))
-    .mockResolvedValue(products);
+  let isOnline = false;
+  vi.spyOn(commerce, 'listProducts').mockImplementation(() =>
+    isOnline ? Promise.resolve(products) : Promise.reject(new Error('offline')),
+  );
   renderCartWithItem('orbita-01', 1);
 
   expect(await screen.findByRole('alert')).toHaveTextContent(/no pudimos cargar/i);
+  expect(
+    within(screen.getByRole('complementary', { name: /resumen del carrito/i })).getByText('$0'),
+  ).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /eliminar fórmula no disponible/i })).not.toBeInTheDocument();
+  isOnline = true;
   await user.click(screen.getByRole('button', { name: /reintentar/i }));
   expect(await screen.findByRole('button', { name: /aumentar órbita 01/i })).toBeInTheDocument();
+  expect(
+    within(screen.getByRole('complementary', { name: /resumen del carrito/i })).getByText('$780'),
+  ).toBeInTheDocument();
 });

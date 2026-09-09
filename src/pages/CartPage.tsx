@@ -1,39 +1,21 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CartLine } from '../components/cart/CartLine';
 import { formatPrice } from '../components/product/ProductCard';
 import { useCart } from '../cart/CartContext';
-import { commerce } from '../commerce/CommerceProvider';
 import type { Product } from '../commerce/types';
 
 export function CartPage() {
-  const { items, subtotal, setQuantity, remove, storageWarning } = useCart();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [catalogStatus, setCatalogStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [loadAttempt, setLoadAttempt] = useState(0);
-
-  useEffect(() => {
-    let isCurrent = true;
-    setCatalogStatus('loading');
-
-    void commerce.listProducts().then(
-      (nextProducts) => {
-        if (isCurrent) {
-          setProducts(nextProducts);
-          setCatalogStatus('ready');
-        }
-      },
-      () => {
-        if (isCurrent) {
-          setCatalogStatus('error');
-        }
-      },
-    );
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [loadAttempt]);
+  const {
+    items,
+    subtotal,
+    setQuantity,
+    remove,
+    storageWarning,
+    products,
+    catalogStatus,
+    retryCatalog,
+  } = useCart();
 
   const productsById = useMemo(
     () => new Map(products.map((product) => [product.id, product])),
@@ -79,7 +61,7 @@ export function CartPage() {
           ) : catalogStatus === 'error' ? (
             <div className="catalog-message">
               <p role="alert">No pudimos cargar tus fórmulas. Inténtalo otra vez.</p>
-              <button type="button" className="button-secondary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+              <button type="button" className="button-secondary" onClick={retryCatalog}>
                 Reintentar
               </button>
             </div>

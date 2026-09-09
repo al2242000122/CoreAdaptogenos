@@ -1,3 +1,5 @@
+import { normalizePhone } from './phone';
+
 export interface OrderLine {
   readonly name: string;
   readonly size: string;
@@ -74,4 +76,3 @@ export function validateCheckout(values: Record<string, string>): CheckoutErrors
   if (values.payment !== CHECKOUT_OPTION_VALUES.payment) errors.payment = 'Selecciona el pago simulado.';
   return errors;
 }
-import { normalizePhone } from './phone';

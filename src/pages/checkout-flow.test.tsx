@@ -8,7 +8,12 @@ import { CART_STORAGE_KEY } from '../cart/storage';
 import { commerce } from '../commerce/CommerceProvider';
 
 beforeEach(() => localStorage.clear());
-afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+afterEach(() => {
+  Reflect.deleteProperty(navigator, 'sendBeacon');
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 function renderFlow(route = '/producto/orbita-01', items: { productId: string; quantity: number }[] = []) {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items }));
@@ -43,7 +48,12 @@ it('offers both paths and reviews the whole cart before opening a correctly enco
 it('validates accessible fields and completes only a simulation without payment or order transmission', async () => {
   const user = userEvent.setup();
   const fetchSpy = vi.fn();
+  const sendBeaconSpy = vi.fn();
   vi.stubGlobal('fetch', fetchSpy);
+  Object.defineProperty(navigator, 'sendBeacon', {
+    configurable: true,
+    value: sendBeaconSpy,
+  });
   const xhrSendSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
   await addAndChoose(user);
   await user.click(await screen.findByRole('link', { name: /pago en línea/i }));
@@ -67,10 +77,12 @@ it('validates accessible fields and completes only a simulation without payment 
   await user.selectOptions(screen.getByLabelText('Pago simulado'), 'demo');
   await user.click(screen.getByRole('button', { name: /finalizar simulación/i }));
   expect(await screen.findByRole('heading', { name: /simulación completada/i })).toBeInTheDocument();
-  expect(screen.getByText(/no se transmitió ningún pedido ni pago/i)).toBeInTheDocument();
+  expect(screen.getByText(/el prototipo no guardó ni transmitió/i)).toBeInTheDocument();
+  expect(screen.getByText(/navegador puede conservar/i)).toBeInTheDocument();
   expect(screen.getByRole('region', { name: /resumen del pedido/i })).toHaveTextContent('Órbita 01');
   expect(JSON.stringify(localStorage)).not.toContain('ana@example.com');
   expect(fetchSpy).not.toHaveBeenCalled();
+  expect(sendBeaconSpy).not.toHaveBeenCalled();
   expect(xhrSendSpy).not.toHaveBeenCalled();
 });
 

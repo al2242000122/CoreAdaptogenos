@@ -50,7 +50,8 @@ it('completes the normal journey after correcting accessible validation errors',
   await user.selectOptions(screen.getByLabelText('Pago simulado'), 'demo');
   await user.click(screen.getByRole('button', { name: /finalizar simulación/i }));
   expect(await screen.findByRole('heading', { name: /simulación completada/i })).toBeInTheDocument();
-  expect(screen.getByText(/no se transmitió ningún pedido ni pago/i)).toBeInTheDocument();
+  expect(screen.getByText(/el prototipo no guardó ni transmitió/i)).toBeInTheDocument();
+  expect(screen.getByText(/navegador puede conservar/i)).toBeInTheDocument();
   expect(screen.getByRole('main')).toHaveFocus();
   expect(JSON.stringify(localStorage)).not.toContain('demo@example.com');
 });
@@ -94,7 +95,7 @@ it('closes mobile navigation on selection and exposes complete supporting pages'
 function CartProbe() {
   const cart = useCart();
   const product = { id: 'orbita-01', name: 'Órbita 01' };
-  return <><output aria-label="Cantidad">{cart.count}</output><output aria-label="Subtotal">{cart.subtotal}</output><p role="status">{cart.storageWarning}</p><output aria-label="Anuncio">{cart.announcement}</output><button onClick={() => cart.add(product, 2)}>Agregar</button><button onClick={() => cart.add(product, Number.NaN)}>Agregar no finito</button><button onClick={() => cart.setQuantity(product, 3)}>Cambiar</button><button onClick={() => cart.setQuantity(product, Number.POSITIVE_INFINITY)}>Cambiar no finito</button><button onClick={() => cart.remove(product)}>Eliminar</button></>;
+  return <><output aria-label="Cantidad">{cart.count}</output><output aria-label="Subtotal">{cart.subtotal}</output><p role="status">{cart.storageWarning}</p><output aria-label="Anuncio">{cart.announcement}</output><button onClick={() => cart.add(product, 2)}>Agregar</button><button onClick={() => { cart.add(product); cart.add(product); }}>Agregar dos sincronizados</button><button onClick={() => cart.add(product, Number.NaN)}>Agregar no finito</button><button onClick={() => cart.setQuantity(product, 3)}>Cambiar</button><button onClick={() => cart.setQuantity(product, Number.POSITIVE_INFINITY)}>Cambiar no finito</button><button onClick={() => cart.remove(product)}>Eliminar</button></>;
 }
 
 it('hydrates provider totals, persists mutations and restores them after remount', async () => {
@@ -132,4 +133,12 @@ it('normalizes nonfinite public mutations before dispatch and announces the stor
   await user.click(screen.getByRole('button', { name: 'Cambiar no finito' }));
   expect(screen.getByLabelText('Cantidad')).toHaveTextContent('1');
   expect(screen.getByLabelText('Anuncio')).toHaveTextContent(/1 unidad en tu carrito/i);
+});
+
+it('announces the actual quantity after two synchronous additions', async () => {
+  const user = userEvent.setup();
+  render(<CartProvider><CartProbe /></CartProvider>);
+  await user.click(screen.getByRole('button', { name: 'Agregar dos sincronizados' }));
+  expect(screen.getByLabelText('Cantidad')).toHaveTextContent('2');
+  expect(screen.getByLabelText('Anuncio')).toHaveTextContent(/ahora tienes 2 unidades/i);
 });
