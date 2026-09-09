@@ -5,11 +5,17 @@ import { HomePage } from '../pages/HomePage';
 import { ShopPage } from '../pages/ShopPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
+import { CheckoutSession } from '../checkout/CheckoutSession';
+import { CheckoutChoicePage } from '../pages/CheckoutChoicePage';
+import { WhatsAppReviewPage } from '../pages/WhatsAppReviewPage';
+import { NormalCheckoutPage } from '../pages/NormalCheckoutPage';
+import { CheckoutSuccessPage } from '../pages/CheckoutSuccessPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { AddToCartToast } from '../components/cart/AddToCartToast';
 import { useCart } from '../cart/CartContext';
 import '../styles/storefront.css';
 import '../styles/cart.css';
+import '../styles/checkout.css';
 
 type PlaceholderPageProps = {
   description: string;
@@ -64,24 +70,12 @@ export function App() {
             }
           />
           <Route path="/carrito" element={<CartPage />} />
-          <Route
-            path="/checkout"
-            element={
-              <PlaceholderPage
-                title="Cómo pedir"
-                description="Elige la forma de continuar con tu pedido de muestra."
-              />
-            }
-          />
-          <Route
-            path="/checkout/normal"
-            element={
-              <PlaceholderPage
-                title="Pago en línea"
-                description="Este checkout es una demostración y no procesa pagos reales."
-              />
-            }
-          />
+          <Route path="/checkout" element={<CheckoutSession />}>
+            <Route index element={<CheckoutChoicePage />} />
+            <Route path="whatsapp" element={<WhatsAppReviewPage />} />
+            <Route path="normal" element={<NormalCheckoutPage />} />
+            <Route path="listo" element={<CheckoutSuccessPage />} />
+          </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <CartFeedback />
