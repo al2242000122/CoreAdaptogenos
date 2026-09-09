@@ -136,6 +136,8 @@
   border: 0;
   color: var(--moon);
   background: var(--violet);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .mobile-menu::backdrop {
   background: var(--ink);
@@ -158,8 +160,179 @@
   gap: 1rem;
 }
 .mobile-menu nav a {
-  font: 3.5rem/1.4 var(--font-display);
+  font: clamp(2.5rem, 10vw, 3.5rem)/1.4 var(--font-display);
   text-decoration: none;
+}
+
+.mobile-menu nav a[aria-current='page'] {
+  color: var(--lime);
+}
+
+.about-page,
+.journal-page {
+  padding-bottom: 5rem;
+}
+
+.editorial-intro {
+  padding-block: clamp(3rem, 7vw, 6rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.editorial-intro h1 {
+  font-size: clamp(3.1rem, 6.2vw, 5.6rem);
+}
+
+.editorial-intro > p:last-child {
+  max-width: 36rem;
+  font-size: .9rem;
+}
+
+.app-shell .about-origin,
+.app-shell .traceability-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(2rem, 7vw, 6rem);
+  padding-block: 4rem;
+}
+
+.about-origin p:not(.eyebrow),
+.method-grid p,
+.traceability-section dd,
+.journal-card > p:last-child {
+  color: var(--mist);
+  font-size: .85rem;
+}
+
+.about-emblem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50% 50% 0 0;
+  background: var(--violet);
+}
+
+.about-emblem > span {
+  color: var(--lime);
+  font: italic clamp(7rem, 15vw, 13rem)/1 var(--font-display);
+  letter-spacing: -.1em;
+}
+
+.about-emblem i {
+  position: absolute;
+  width: 65%;
+  height: 85%;
+  border: 1px solid var(--mineral);
+  border-radius: 50%;
+  transform: rotate(35deg);
+}
+
+.about-emblem small {
+  position: absolute;
+  bottom: 1.5rem;
+  font-size: .55rem;
+  letter-spacing: .15em;
+  color: var(--mist);
+}
+
+.app-shell .about-method {
+  padding-block: 3rem;
+  border-block: 1px solid var(--line);
+}
+
+.method-grid,
+.app-shell .journal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.method-grid article {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.method-grid h3 {
+  margin: 1rem 0;
+  font-size: 2rem;
+}
+
+.traceability-section dl { margin: 0; }
+.traceability-section dl > div {
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.traceability-section dt { color: var(--moon); }
+.traceability-section dd { margin: .5rem 0 0; line-height: 1.6; }
+.editorial-disclaimer {
+  margin-bottom: 2rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--mineral);
+  color: var(--mist);
+  font-size: .75rem;
+  max-width: 45rem;
+}
+.app-shell .journal-grid { padding-block: 3rem; }
+.journal-card h2 { font-size: clamp(1.8rem, 2.5vw, 2.5rem); }
+.journal-card > .eyebrow { margin-block: 1.5rem 1rem; }
+.journal-cover {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  padding: 1.25rem;
+  color: var(--ink);
+}
+.journal-cover--mineral { background: var(--mineral); }
+.journal-cover--lime { background: var(--lime); }
+.journal-cover--lavender { background: var(--mist); }
+.journal-cover > span { font-size: .5rem; letter-spacing: .14em; z-index: 1; }
+.journal-cover b { align-self: flex-end; font: 5rem/1 var(--font-display); z-index: 1; }
+.journal-cover i {
+  position: absolute;
+  inset: 15% 22%;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  transform: rotate(30deg);
+}
+.journal-cover i::after {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+}
+.journal-cover--lime i { transform: rotate(-30deg); }
+.journal-cover--lavender i { transform: rotate(90deg); }
+.journal-invitation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 2rem;
+}
+
+@media (max-width: 50rem) {
+  .desktop-navigation { display: none; }
+  .header-actions .menu-trigger { display: inline-flex; align-items: center; gap: .5rem; }
+  .app-shell .journal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .method-grid { gap: 1rem; }
+}
+
+@media (max-width: 40rem) {
+  .app-shell .about-origin,
+  .app-shell .traceability-section,
+  .method-grid,
+  .app-shell .journal-grid { grid-template-columns: 1fr; }
+  .about-emblem { width: 85%; }
+  .journal-cover { aspect-ratio: 1; }
+  .journal-invitation { align-items: flex-start; flex-direction: column; }
+  .mobile-menu { padding: 1.25rem; }
 }
 .mobile-menu > p:last-child {
   margin-top: 4rem;

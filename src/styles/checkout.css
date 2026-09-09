@@ -30,3 +30,10 @@
 .checkout-recovery a { display: inline-flex; align-items: center; margin-top: 1rem; }
 @media (max-width: 50rem) { .checkout-layout { grid-template-columns: 1fr; } }
 @media (max-width: 32rem) { .checkout-fields { grid-template-columns: 1fr; } }
+
+@media (max-width: 32rem) {
+  .checkout-choice { padding: 1.15rem; }
+  .checkout-page .button-primary,
+  .checkout-page .button-secondary { max-width: 100%; gap: .75rem; }
+  .order-message { padding-inline: 0; }
+}

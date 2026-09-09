@@ -14,6 +14,17 @@
   box-sizing: border-box;
 }
 
+img,
+svg {
+  max-width: 100%;
+}
+
+main,
+main > *,
+main section > * {
+  min-width: 0;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -166,10 +177,12 @@ h1 + p {
   border-radius: var(--radius-pill);
   background: var(--lime);
   color: var(--ink);
+  clip-path: inset(50%);
   transform: translateY(-150%);
 }
 
 .skip-link:focus {
+  clip-path: none;
   transform: translateY(0);
 }
 
