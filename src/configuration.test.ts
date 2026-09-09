@@ -11,3 +11,20 @@ it('ships without an active WhatsApp destination and documents explicit verifica
   expect(readme).toMatch(/configura explícitamente.*número.*verificado/i);
   expect(readme).toMatch(/prototipo no (?:los )?guarda ni los transmite.*navegador puede conservar/i);
 });
+
+it('ships an Apache SPA fallback for direct client-side routes', () => {
+  const htaccess = readFileSync(resolve(process.cwd(), 'public/.htaccess'), 'utf8');
+
+  expect(htaccess.replace(/\r\n/g, '\n').trim()).toBe(
+    [
+      '<IfModule mod_rewrite.c>',
+      '  RewriteEngine On',
+      '  RewriteBase /',
+      '  RewriteRule ^index\\.html$ - [L]',
+      '  RewriteCond %{REQUEST_FILENAME} !-f',
+      '  RewriteCond %{REQUEST_FILENAME} !-d',
+      '  RewriteRule . /index.html [L]',
+      '</IfModule>',
+    ].join('\n'),
+  );
+});
