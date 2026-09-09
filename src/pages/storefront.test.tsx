@@ -83,6 +83,21 @@ it('uses the chosen quantity and exposes composition and demonstrative lot', asy
   ).toHaveAttribute('aria-live', 'polite');
 });
 
+it('keeps live feedback mounted and distinguishes repeated additions by resulting quantity', async () => {
+  const user = userEvent.setup();
+  renderTestApp('/producto/orbita-01');
+  await screen.findByRole('heading', { name: /órbita 01/i });
+
+  const status = screen.getByRole('status');
+  expect(status).toBeEmptyDOMElement();
+
+  await user.click(screen.getByRole('button', { name: /agregar al carrito/i }));
+  expect(status).toHaveTextContent(/ahora tienes 1 unidad/i);
+
+  await user.click(screen.getByRole('button', { name: /agregar al carrito/i }));
+  expect(status).toHaveTextContent(/ahora tienes 2 unidades/i);
+});
+
 it('offers catalog recovery for unknown product slugs', async () => {
   renderTestApp('/producto/no-existe');
   expect(

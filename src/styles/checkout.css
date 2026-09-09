@@ -23,7 +23,7 @@
 .checkout-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin-block: 2rem; }
 .checkout-field { display: grid; align-content: start; gap: .5rem; }
 .checkout-field label { font-size: .8rem; }
-.checkout-field input, .checkout-field select { width: 100%; min-width: 0; padding: .75rem; border: 1px solid var(--line); border-radius: 0; color: var(--moon); background: var(--violet); font-size: .85rem; }
+.checkout-field input, .checkout-field select { width: 100%; min-width: 0; padding: .75rem; border: 1px solid var(--mist); border-radius: 0; color: var(--moon); background: var(--violet); font-size: .85rem; }
 .checkout-field [aria-invalid='true'] { border-color: var(--danger); }
 .checkout-error { margin: 0; color: var(--danger); font-size: .8rem; }
 .checkout-recovery { padding-block: 2rem; }

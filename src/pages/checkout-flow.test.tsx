@@ -108,6 +108,25 @@ it('blocks partial unavailable carts so items are not silently omitted', async (
   expect(screen.queryByRole('button', { name: /finalizar simulación/i })).not.toBeInTheDocument();
 });
 
+it('removes an unavailable persisted item and continues through checkout', async () => {
+  const user = userEvent.setup();
+  renderFlow('/carrito', [
+    { productId: 'orbita-01', quantity: 1 },
+    { productId: 'retirada', quantity: 1 },
+  ]);
+
+  await user.click(
+    await screen.findByRole('button', { name: /eliminar fórmula no disponible retirada/i }),
+  );
+  expect(screen.queryByText(/ya no está disponible en el catálogo/i)).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('link', { name: /elegir cómo pedir/i }));
+  expect(await screen.findByRole('link', { name: /pago en línea/i })).toHaveAttribute(
+    'href',
+    '/checkout/normal',
+  );
+});
+
 it('recovers from catalog failure without exposing checkout actions', async () => {
   vi.spyOn(commerce, 'listProducts').mockRejectedValue(new Error('offline'));
   renderFlow('/checkout/whatsapp', [{ productId: 'orbita-01', quantity: 1 }]);

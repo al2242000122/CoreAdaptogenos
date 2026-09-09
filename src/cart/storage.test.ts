@@ -20,6 +20,26 @@ describe('cart storage', () => {
     expect(loadCart()).toEqual({ items: [{ productId: 'orbita-01', quantity: 2 }] });
   });
 
+  it('consolidates duplicate product IDs without exceeding the per-product cap', () => {
+    localStorage.setItem(
+      'coreadaptogenos-cart',
+      JSON.stringify({
+        items: [
+          { productId: 'orbita-01', quantity: 12 },
+          { productId: 'pulso-02', quantity: 2 },
+          { productId: 'orbita-01', quantity: 12 },
+        ],
+      }),
+    );
+
+    expect(loadCart()).toEqual({
+      items: [
+        { productId: 'orbita-01', quantity: 20 },
+        { productId: 'pulso-02', quantity: 2 },
+      ],
+    });
+  });
+
   it.each([
     null,
     { items: 'orbita-01' },

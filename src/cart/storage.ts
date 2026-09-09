@@ -1,6 +1,7 @@
 import type { CartItem, CartState } from './types';
 
 export const CART_STORAGE_KEY = 'coreadaptogenos-cart';
+const MAX_PRODUCT_QUANTITY = 20;
 
 const emptyCart = (): CartState => ({ items: [] });
 
@@ -27,6 +28,19 @@ const isCartState = (value: unknown): value is CartState => {
   return (value as CartState).items.every(isCartItem);
 };
 
+const consolidateItems = (items: CartItem[]): CartItem[] => {
+  const quantities = new Map<string, number>();
+
+  for (const item of items) {
+    quantities.set(
+      item.productId,
+      Math.min(MAX_PRODUCT_QUANTITY, (quantities.get(item.productId) ?? 0) + item.quantity),
+    );
+  }
+
+  return Array.from(quantities, ([productId, quantity]) => ({ productId, quantity }));
+};
+
 export const loadCart = (): CartState => {
   try {
     const storedCart = localStorage.getItem(CART_STORAGE_KEY);
@@ -35,7 +49,7 @@ export const loadCart = (): CartState => {
     }
 
     const parsedCart: unknown = JSON.parse(storedCart);
-    return isCartState(parsedCart) ? parsedCart : emptyCart();
+    return isCartState(parsedCart) ? { items: consolidateItems(parsedCart.items) } : emptyCart();
   } catch {
     return emptyCart();
   }

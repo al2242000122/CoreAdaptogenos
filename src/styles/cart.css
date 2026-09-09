@@ -152,6 +152,22 @@
   line-height: 1.6;
 }
 
+.cart-unavailable ul {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 1rem 0 0;
+  list-style: none;
+}
+
+.cart-unavailable li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .cart-summary {
   position: sticky;
   top: 1rem;
@@ -184,6 +200,11 @@
   margin: 1.5rem 0 0;
   color: var(--lime);
   font-size: 0.7rem;
+}
+
+.cart-toast:empty {
+  min-height: 0;
+  margin: 0;
 }
 
 @media (max-width: 50rem) {

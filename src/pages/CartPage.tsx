@@ -41,8 +41,9 @@ export function CartPage() {
     const product = productsById.get(item.productId);
     return product ? [{ product, quantity: item.quantity }] : [];
   });
+  const unavailableItems = items.filter((item) => !productsById.has(item.productId));
   const isEmpty = items.length === 0;
-  const unavailableItemCount = items.length - lines.length;
+  const unavailableItemCount = unavailableItems.length;
   const canCheckout = lines.length > 0;
 
   const updateQuantity = (product: Product, quantity: number) => {
@@ -85,11 +86,28 @@ export function CartPage() {
                 />
               ))}
               {unavailableItemCount > 0 && (
-                <p className="cart-unavailable" role="alert">
-                  {unavailableItemCount === 1
-                    ? 'Una fórmula ya no está disponible en el catálogo.'
-                    : `${unavailableItemCount} fórmulas ya no están disponibles en el catálogo.`}
-                </p>
+                <div className="cart-unavailable">
+                  <p role="alert">
+                    {unavailableItemCount === 1
+                      ? 'Una fórmula ya no está disponible en el catálogo.'
+                      : `${unavailableItemCount} fórmulas ya no están disponibles en el catálogo.`}
+                  </p>
+                  <ul>
+                    {unavailableItems.map((item) => (
+                      <li key={item.productId}>
+                        <span>Referencia guardada: {item.productId}</span>
+                        <button
+                          type="button"
+                          className="cart-line__remove"
+                          aria-label={`Eliminar fórmula no disponible ${item.productId}`}
+                          onClick={() => remove(item.productId, 'La fórmula no disponible')}
+                        >
+                          Eliminar
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </>
           )}

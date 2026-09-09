@@ -74,11 +74,15 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
       add: (productId, quantity = 1, productName = 'La fórmula') => {
         const currentQuantity =
           state.items.find((item) => item.productId === productId)?.quantity ?? 0;
+        const resultingQuantity = Math.min(
+          MAX_PRODUCT_QUANTITY,
+          currentQuantity + Math.max(1, Math.trunc(quantity)),
+        );
         dispatch({ type: 'add', productId, quantity });
         setAnnouncement(
-          currentQuantity + quantity >= MAX_PRODUCT_QUANTITY
-            ? `${productName} se agregó a tu carrito. Alcanzaste el límite de 20 unidades de esta fórmula.`
-            : `${productName} se agregó a tu carrito.`,
+          resultingQuantity >= MAX_PRODUCT_QUANTITY
+            ? `${productName} se agregó a tu carrito. Ahora tienes 20 unidades. Alcanzaste el límite de 20 unidades de esta fórmula.`
+            : `${productName} se agregó a tu carrito. Ahora tienes ${resultingQuantity} ${resultingQuantity === 1 ? 'unidad' : 'unidades'}.`,
         );
       },
       setQuantity: (productId, quantity, productName = 'La fórmula') => {
