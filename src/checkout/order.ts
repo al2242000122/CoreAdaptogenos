@@ -35,14 +35,19 @@ export function createOrderSnapshot(
 }
 
 export const checkoutFields = [
-  { name: 'name', label: 'Nombre', type: 'text', autoComplete: 'name' },
-  { name: 'email', label: 'Correo electrónico', type: 'email', autoComplete: 'email' },
-  { name: 'phone', label: 'Teléfono', type: 'tel', autoComplete: 'tel' },
-  { name: 'street', label: 'Calle y número', type: 'text', autoComplete: 'street-address' },
-  { name: 'city', label: 'Ciudad', type: 'text', autoComplete: 'address-level2' },
-  { name: 'state', label: 'Estado', type: 'text', autoComplete: 'address-level1' },
-  { name: 'postalCode', label: 'Código postal', type: 'text', autoComplete: 'postal-code' },
+  { name: 'name', label: 'Nombre', type: 'text', placeholder: 'Persona Ficticia' },
+  { name: 'email', label: 'Correo electrónico', type: 'email', placeholder: 'demo@example.invalid' },
+  { name: 'phone', label: 'Teléfono', type: 'tel', placeholder: '5500000000' },
+  { name: 'street', label: 'Calle y número', type: 'text', placeholder: 'Calle de Muestra 123' },
+  { name: 'city', label: 'Ciudad', type: 'text', placeholder: 'Ciudad de Prueba' },
+  { name: 'state', label: 'Estado', type: 'text', placeholder: 'Estado de Prueba' },
+  { name: 'postalCode', label: 'Código postal', type: 'text', placeholder: '00000' },
 ] as const;
+
+export const CHECKOUT_OPTION_VALUES = {
+  shipping: 'standard',
+  payment: 'demo',
+} as const;
 
 export type CheckoutField = typeof checkoutFields[number]['name'] | 'shipping' | 'payment';
 export type CheckoutErrors = Partial<Record<CheckoutField, string>>;
@@ -58,15 +63,15 @@ export function validateCheckout(values: Record<string, string>): CheckoutErrors
     errors.email = 'Escribe un correo válido.';
   }
   if (!errors.phone && (
-    !/^[+\d\s().-]+$/.test(values.phone) ||
-    !/^\d{10,15}$/.test(values.phone.replace(/\D/g, ''))
+    !normalizePhone(values.phone)
   )) {
     errors.phone = 'Escribe un teléfono válido de 10 a 15 dígitos.';
   }
   if (!errors.postalCode && !/^\d{5}$/.test(values.postalCode.trim())) {
     errors.postalCode = 'Escribe un código postal de 5 dígitos.';
   }
-  if (values.shipping !== 'standard') errors.shipping = 'Selecciona una opción de envío.';
-  if (values.payment !== 'demo') errors.payment = 'Selecciona el pago simulado.';
+  if (values.shipping !== CHECKOUT_OPTION_VALUES.shipping) errors.shipping = 'Selecciona una opción de envío.';
+  if (values.payment !== CHECKOUT_OPTION_VALUES.payment) errors.payment = 'Selecciona el pago simulado.';
   return errors;
 }
+import { normalizePhone } from './phone';

@@ -1,4 +1,9 @@
-import { createOrderId, createOrderSnapshot, validateCheckout } from './order';
+import {
+  CHECKOUT_OPTION_VALUES,
+  createOrderId,
+  createOrderSnapshot,
+  validateCheckout,
+} from './order';
 
 it('uses the supplied UTC date and random samples for a padded alphanumeric ID', () => {
   const samples = [10 / 36, 11 / 36, 1 / 36, 2 / 36];
@@ -14,7 +19,7 @@ it('copies order lines and derives the subtotal so later cart mutations cannot c
   expect(order).toEqual({ id: 'CA-260907-0000', lines: [{ name: 'Órbita 01', size: '30 ml', quantity: 2, unitPrice: 690 }], subtotal: 1380 });
 });
 
-const valid = { name: 'Ana Luna', email: 'ana@example.com', phone: '+52 55 1234 5678', street: 'Luna 10', city: 'Ciudad de México', state: 'CDMX', postalCode: '01234', shipping: 'standard', payment: 'demo' };
+const valid = { name: 'Ana Luna', email: 'ana@example.com', phone: '+52 55 1234 5678', street: 'Luna 10', city: 'Ciudad de México', state: 'CDMX', postalCode: '01234', shipping: CHECKOUT_OPTION_VALUES.shipping, payment: CHECKOUT_OPTION_VALUES.payment };
 
 it('accepts complete demo details and rejects blank required fields', () => {
   expect(validateCheckout(valid)).toEqual({});
@@ -23,4 +28,8 @@ it('accepts complete demo details and rejects blank required fields', () => {
 
 it('rejects malformed contact details, postal code and unsupported selectors', () => {
   expect(Object.keys(validateCheckout({ ...valid, email: 'ana@', phone: 'hola', postalCode: '1234', shipping: 'unknown', payment: 'real-card' }))).toEqual(['email', 'phone', 'postalCode', 'shipping', 'payment']);
+});
+
+it.each(['52+5512345678', '++525512345678'])('rejects plus signs outside one optional prefix: %s', (phone) => {
+  expect(validateCheckout({ ...valid, phone })).toHaveProperty('phone');
 });

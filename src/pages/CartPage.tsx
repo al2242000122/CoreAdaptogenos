@@ -9,21 +9,23 @@ import type { Product } from '../commerce/types';
 export function CartPage() {
   const { items, subtotal, setQuantity, remove, storageWarning } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [catalogStatus, setCatalogStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
     let isCurrent = true;
+    setCatalogStatus('loading');
 
     void commerce.listProducts().then(
       (nextProducts) => {
         if (isCurrent) {
           setProducts(nextProducts);
-          setIsLoading(false);
+          setCatalogStatus('ready');
         }
       },
       () => {
         if (isCurrent) {
-          setIsLoading(false);
+          setCatalogStatus('error');
         }
       },
     );
@@ -31,7 +33,7 @@ export function CartPage() {
     return () => {
       isCurrent = false;
     };
-  }, []);
+  }, [loadAttempt]);
 
   const productsById = useMemo(
     () => new Map(products.map((product) => [product.id, product])),
@@ -44,14 +46,14 @@ export function CartPage() {
   const unavailableItems = items.filter((item) => !productsById.has(item.productId));
   const isEmpty = items.length === 0;
   const unavailableItemCount = unavailableItems.length;
-  const canCheckout = lines.length > 0;
+  const canCheckout = catalogStatus === 'ready' && lines.length > 0 && unavailableItemCount === 0;
 
   const updateQuantity = (product: Product, quantity: number) => {
-    setQuantity(product.id, quantity, product.name);
+    setQuantity(product, quantity);
   };
 
   const removeLine = (product: Product) => {
-    remove(product.id, product.name);
+    remove(product);
   };
 
   return (
@@ -70,10 +72,17 @@ export function CartPage() {
               <p>Cuando una fórmula te encuentre, aparecerá aquí.</p>
               <Link to="/tienda">Volver a la tienda</Link>
             </div>
-          ) : isLoading ? (
+          ) : catalogStatus === 'loading' ? (
             <p className="catalog-message" role="status">
               Reuniendo tus fórmulas…
             </p>
+          ) : catalogStatus === 'error' ? (
+            <div className="catalog-message">
+              <p role="alert">No pudimos cargar tus fórmulas. Inténtalo otra vez.</p>
+              <button type="button" className="button-secondary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+                Reintentar
+              </button>
+            </div>
           ) : (
             <>
               {lines.map(({ product, quantity }) => (
@@ -100,7 +109,7 @@ export function CartPage() {
                           type="button"
                           className="cart-line__remove"
                           aria-label={`Eliminar fórmula no disponible ${item.productId}`}
-                          onClick={() => remove(item.productId, 'La fórmula no disponible')}
+                          onClick={() => remove({ id: item.productId, name: 'La fórmula no disponible' })}
                         >
                           Eliminar
                         </button>

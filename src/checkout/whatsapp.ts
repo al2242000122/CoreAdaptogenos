@@ -1,4 +1,5 @@
 import type { Order } from './order';
+import { normalizePhone } from './phone';
 
 export const formatOrderPrice = (amount: number) =>
   `${new Intl.NumberFormat('es-MX', {
@@ -23,7 +24,7 @@ export function buildWhatsAppMessage(order: Order): string {
 }
 
 export function buildWhatsAppUrl(phone: string, message: string): string {
-  const normalized = phone.replace(/[\s\p{P}+]/gu, '');
-  if (!/^[1-9]\d{9,14}$/.test(normalized)) throw new Error('WhatsApp no configurado');
+  const normalized = normalizePhone(phone);
+  if (!normalized) throw new Error('WhatsApp no configurado');
   return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
 }

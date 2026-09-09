@@ -6,8 +6,7 @@ import { useCart } from '../cart/CartContext';
 import { ProductVisual } from '../components/product/ProductVisual';
 import { formatPrice } from '../components/product/ProductCard';
 import { NotFoundPage } from './NotFoundPage';
-
-const MAX_PRODUCT_QUANTITY = 20;
+import { MAX_PRODUCT_QUANTITY } from '../cart/constants';
 
 function ProductDetail({ slug }: { slug: string }) {
   const [product, setProduct] = useState<Product | null | undefined>(null);
@@ -81,7 +80,7 @@ function ProductDetail({ slug }: { slug: string }) {
             onSubmit={(event) => {
               event.preventDefault();
               if (atLimit) return;
-              add(product.id, selectedQuantity, product.name);
+              add(product, selectedQuantity);
             }}
           >
             <label htmlFor="product-quantity">
@@ -113,7 +112,7 @@ function ProductDetail({ slug }: { slug: string }) {
           </form>
           {atLimit && (
             <p className="added-message" id="product-capacity-note">
-              Alcanzaste el límite de 20 unidades de esta fórmula en tu carrito.
+              Alcanzaste el límite de {MAX_PRODUCT_QUANTITY} unidades de esta fórmula en tu carrito.
             </p>
           )}
           {storageWarning && <p role="alert">{storageWarning}</p>}

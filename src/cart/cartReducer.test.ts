@@ -40,12 +40,4 @@ describe('cartReducer', () => {
     expect(state.items).toEqual([{ productId: 'pulso-02', quantity: 2 }]);
   });
 
-  it('clears every item', () => {
-    const state = cartReducer(
-      { items: [{ productId: 'orbita-01', quantity: 1 }] },
-      { type: 'clear' },
-    );
-
-    expect(state).toEqual(initialCartState);
-  });
 });

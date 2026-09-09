@@ -93,7 +93,8 @@ it('closes mobile navigation on selection and exposes complete supporting pages'
 
 function CartProbe() {
   const cart = useCart();
-  return <><output aria-label="Cantidad">{cart.count}</output><output aria-label="Subtotal">{cart.subtotal}</output><p role="status">{cart.storageWarning}</p><button onClick={() => cart.add('orbita-01', 2)}>Agregar</button><button onClick={() => cart.setQuantity('orbita-01', 3)}>Cambiar</button><button onClick={() => cart.remove('orbita-01')}>Eliminar</button></>;
+  const product = { id: 'orbita-01', name: 'Órbita 01' };
+  return <><output aria-label="Cantidad">{cart.count}</output><output aria-label="Subtotal">{cart.subtotal}</output><p role="status">{cart.storageWarning}</p><output aria-label="Anuncio">{cart.announcement}</output><button onClick={() => cart.add(product, 2)}>Agregar</button><button onClick={() => cart.add(product, Number.NaN)}>Agregar no finito</button><button onClick={() => cart.setQuantity(product, 3)}>Cambiar</button><button onClick={() => cart.setQuantity(product, Number.POSITIVE_INFINITY)}>Cambiar no finito</button><button onClick={() => cart.remove(product)}>Eliminar</button></>;
 }
 
 it('hydrates provider totals, persists mutations and restores them after remount', async () => {
@@ -120,4 +121,15 @@ it('keeps the provider usable in memory when device storage rejects writes', asy
   expect(screen.getByText(/no se pudo guardar/i)).toHaveAttribute('role', 'status');
   await waitFor(() => expect(screen.getByLabelText('Subtotal')).toHaveTextContent('1560'));
   expect(screen.getByLabelText('Cantidad')).toHaveTextContent('2');
+});
+
+it('normalizes nonfinite public mutations before dispatch and announces the stored quantity', async () => {
+  const user = userEvent.setup();
+  render(<CartProvider><CartProbe /></CartProvider>);
+  await user.click(screen.getByRole('button', { name: 'Agregar no finito' }));
+  expect(screen.getByLabelText('Cantidad')).toHaveTextContent('1');
+  expect(screen.getByLabelText('Anuncio')).toHaveTextContent(/ahora tienes 1 unidad/i);
+  await user.click(screen.getByRole('button', { name: 'Cambiar no finito' }));
+  expect(screen.getByLabelText('Cantidad')).toHaveTextContent('1');
+  expect(screen.getByLabelText('Anuncio')).toHaveTextContent(/1 unidad en tu carrito/i);
 });

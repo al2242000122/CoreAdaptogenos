@@ -2,10 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useReducer, useState } f
 import { commerce } from '../commerce/CommerceProvider';
 import type { Product } from '../commerce/types';
 import { cartReducer } from './cartReducer';
+import { MAX_PRODUCT_QUANTITY, normalizeProductQuantity } from './constants';
 import { loadCart, saveCart } from './storage';
 import type { CartItem } from './types';
 
-const MAX_PRODUCT_QUANTITY = 20;
+type CartProduct = Pick<Product, 'id' | 'name'>;
 
 interface CartContextValue {
   items: CartItem[];
@@ -13,10 +14,9 @@ interface CartContextValue {
   subtotal: number;
   storageWarning: string | null;
   announcement: string;
-  add: (productId: string, quantity?: number, productName?: string) => void;
-  setQuantity: (productId: string, quantity: number, productName?: string) => void;
-  remove: (productId: string, productName?: string) => void;
-  clear: () => void;
+  add: (product: CartProduct, quantity?: number) => void;
+  setQuantity: (product: CartProduct, quantity: number) => void;
+  remove: (product: CartProduct) => void;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -71,35 +71,30 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
       subtotal,
       storageWarning,
       announcement,
-      add: (productId, quantity = 1, productName = 'La fórmula') => {
+      add: (product, quantity = 1) => {
+        const normalizedQuantity = normalizeProductQuantity(quantity);
         const currentQuantity =
-          state.items.find((item) => item.productId === productId)?.quantity ?? 0;
-        const resultingQuantity = Math.min(
-          MAX_PRODUCT_QUANTITY,
-          currentQuantity + Math.max(1, Math.trunc(quantity)),
-        );
-        dispatch({ type: 'add', productId, quantity });
+          state.items.find((item) => item.productId === product.id)?.quantity ?? 0;
+        const resultingQuantity = normalizeProductQuantity(currentQuantity + normalizedQuantity);
+        dispatch({ type: 'add', productId: product.id, quantity: normalizedQuantity });
         setAnnouncement(
           resultingQuantity >= MAX_PRODUCT_QUANTITY
-            ? `${productName} se agregó a tu carrito. Ahora tienes 20 unidades. Alcanzaste el límite de 20 unidades de esta fórmula.`
-            : `${productName} se agregó a tu carrito. Ahora tienes ${resultingQuantity} ${resultingQuantity === 1 ? 'unidad' : 'unidades'}.`,
+            ? `${product.name} se agregó a tu carrito. Ahora tienes ${MAX_PRODUCT_QUANTITY} unidades. Alcanzaste el límite de ${MAX_PRODUCT_QUANTITY} unidades de esta fórmula.`
+            : `${product.name} se agregó a tu carrito. Ahora tienes ${resultingQuantity} ${resultingQuantity === 1 ? 'unidad' : 'unidades'}.`,
         );
       },
-      setQuantity: (productId, quantity, productName = 'La fórmula') => {
-        dispatch({ type: 'setQuantity', productId, quantity });
+      setQuantity: (product, quantity) => {
+        const normalizedQuantity = quantity === 0 ? 0 : normalizeProductQuantity(quantity);
+        dispatch({ type: 'setQuantity', productId: product.id, quantity: normalizedQuantity });
         setAnnouncement(
-          quantity === 0
-            ? `${productName} se eliminó de tu carrito.`
-            : `${productName}: ${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} en tu carrito.`,
+          normalizedQuantity === 0
+            ? `${product.name} se eliminó de tu carrito.`
+            : `${product.name}: ${normalizedQuantity} ${normalizedQuantity === 1 ? 'unidad' : 'unidades'} en tu carrito.`,
         );
       },
-      remove: (productId, productName = 'La fórmula') => {
-        dispatch({ type: 'remove', productId });
-        setAnnouncement(`${productName} se eliminó de tu carrito.`);
-      },
-      clear: () => {
-        dispatch({ type: 'clear' });
-        setAnnouncement('Tu carrito se vació.');
+      remove: (product) => {
+        dispatch({ type: 'remove', productId: product.id });
+        setAnnouncement(`${product.name} se eliminó de tu carrito.`);
       },
     }),
     [announcement, count, state.items, storageWarning, subtotal],

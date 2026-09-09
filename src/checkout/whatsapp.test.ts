@@ -14,10 +14,19 @@ it('builds a readable order including each size, quantity, price and subtotal', 
 });
 
 it('normalizes phone punctuation and encodes accented text and reserved characters exactly once', () => {
-  const url = buildWhatsAppUrl('+52 (1) 55-1234.5678', 'Órbita & 10%\n¿Sí?');
+  const url = buildWhatsAppUrl('+52 (1) 55-1234-5678', 'Órbita & 10%\n¿Sí?');
   expect(url).toBe('https://wa.me/5215512345678?text=%C3%93rbita%20%26%2010%25%0A%C2%BFS%C3%AD%3F');
 });
 
-it.each(['', '123', '0000000000', '+52ABC5512345678', '1234567890123456'])('rejects an unusable phone: %s', (phone) => {
+it.each([
+  '',
+  '123',
+  '0000000000',
+  '+52ABC5512345678',
+  '1234567890123456',
+  '52+15512345678',
+  '++5215512345678',
+  '+52.15512345678',
+])('rejects an unusable phone: %s', (phone) => {
   expect(() => buildWhatsAppUrl(phone, 'pedido')).toThrow('WhatsApp no configurado');
 });

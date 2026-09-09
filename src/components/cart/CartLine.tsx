@@ -1,5 +1,6 @@
 import type { Product } from '../../commerce/types';
 import { formatPrice } from '../product/ProductCard';
+import { MAX_PRODUCT_QUANTITY } from '../../cart/constants';
 
 type CartLineProps = {
   product: Product;
@@ -7,8 +8,6 @@ type CartLineProps = {
   onQuantityChange: (quantity: number) => void;
   onRemove: () => void;
 };
-
-const MAX_PRODUCT_QUANTITY = 20;
 
 export function CartLine({
   product,

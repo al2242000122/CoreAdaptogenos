@@ -8,7 +8,7 @@ import { CART_STORAGE_KEY } from '../cart/storage';
 import { commerce } from '../commerce/CommerceProvider';
 
 beforeEach(() => localStorage.clear());
-afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
+afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 function renderFlow(route = '/producto/orbita-01', items: { productId: string; quantity: number }[] = []) {
   localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items }));
@@ -42,8 +42,16 @@ it('offers both paths and reviews the whole cart before opening a correctly enco
 
 it('validates accessible fields and completes only a simulation without payment or order transmission', async () => {
   const user = userEvent.setup();
+  const fetchSpy = vi.fn();
+  vi.stubGlobal('fetch', fetchSpy);
+  const xhrSendSpy = vi.spyOn(XMLHttpRequest.prototype, 'send');
   await addAndChoose(user);
   await user.click(await screen.findByRole('link', { name: /pago en línea/i }));
+  const form = screen.getByRole('form', { name: /datos de muestra/i });
+  expect(form).toHaveAttribute('autocomplete', 'off');
+  expect(screen.getByLabelText('Correo electrónico')).toHaveAttribute('autocomplete', 'off');
+  expect(screen.getByLabelText('Calle y número')).toHaveAttribute('autocomplete', 'off');
+  expect(screen.getByText(/el navegador puede conservarlos/i)).toBeInTheDocument();
   expect(screen.queryByLabelText(/número de tarjeta|cvv|caducidad/i)).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: /finalizar simulación/i }));
   expect(screen.getByRole('alert')).toHaveTextContent(/revisa los campos/i);
@@ -62,6 +70,8 @@ it('validates accessible fields and completes only a simulation without payment 
   expect(screen.getByText(/no se transmitió ningún pedido ni pago/i)).toBeInTheDocument();
   expect(screen.getByRole('region', { name: /resumen del pedido/i })).toHaveTextContent('Órbita 01');
   expect(JSON.stringify(localStorage)).not.toContain('ana@example.com');
+  expect(fetchSpy).not.toHaveBeenCalled();
+  expect(xhrSendSpy).not.toHaveBeenCalled();
 });
 
 it.each(['', 'incorrecto'])('offers copying when the configured phone is unusable: %s', async (phone) => {

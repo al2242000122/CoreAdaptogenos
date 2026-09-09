@@ -10,5 +10,4 @@ export interface CartState {
 export type CartAction =
   | { type: 'add'; productId: string; quantity: number }
   | { type: 'setQuantity'; productId: string; quantity: number }
-  | { type: 'remove'; productId: string }
-  | { type: 'clear' };
+  | { type: 'remove'; productId: string };
