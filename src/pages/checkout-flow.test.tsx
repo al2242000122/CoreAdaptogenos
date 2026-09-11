@@ -1,13 +1,18 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import { vi } from 'vitest';
 import { App } from '../app/App';
-import { CartProvider } from '../cart/CartContext';
+import { CartProvider, useCart } from '../cart/CartContext';
 import { CART_STORAGE_KEY } from '../cart/storage';
 import { commerce } from '../commerce/CommerceProvider';
+import { CheckoutSession, useCheckout } from '../checkout/CheckoutSession';
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  sessionStorage.clear();
+});
 afterEach(() => {
   Reflect.deleteProperty(navigator, 'sendBeacon');
   vi.unstubAllEnvs();
@@ -120,8 +125,56 @@ it.each(['/checkout', '/checkout/normal', '/checkout/whatsapp'])('blocks empty d
 
 it('does not claim completion on a direct success URL', async () => {
   renderFlow('/checkout/listo', [{ productId: 'orbita-01', quantity: 1 }]);
-  expect(await screen.findByText(/no hay una simulación completada/i)).toBeInTheDocument();
+  expect(await screen.findByText(/no hay un pedido completado/i)).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: /simulación completada/i })).not.toBeInTheDocument();
+});
+
+it('restores a recent WooCommerce confirmation after a success-page reload', async () => {
+  sessionStorage.setItem('coreadaptogenos-checkout-session', JSON.stringify({
+    savedAt: Date.now(),
+    order: { id: 'CA-260910-AB12', lines: [{ name: 'Órbita 01', size: '30 ml', quantity: 1, unitPrice: 780 }], subtotal: 780 },
+    completion: { mode: 'woocommerce', orderNumber: '77', total: 840 },
+  }));
+  renderFlow('/checkout/listo');
+  expect(await screen.findByRole('heading', { name: /pedido creado/i })).toBeInTheDocument();
+  expect(screen.getByText(/#77/)).toBeInTheDocument();
+});
+
+it('keeps the success outlet visible when a completed WooCommerce cart is cleared', async () => {
+  function CompleteAndClear() {
+    const { complete } = useCheckout();
+    const { clear } = useCart();
+    const navigate = useNavigate();
+    const didComplete = useRef(false);
+    useEffect(() => {
+      if (didComplete.current) return;
+      didComplete.current = true;
+      complete({ mode: 'woocommerce', orderNumber: '77', total: 1560 });
+      clear();
+      navigate('/checkout/listo');
+    }, [clear, complete, navigate]);
+    return null;
+  }
+
+  function SuccessProbe() {
+    const { completed, completion } = useCheckout();
+    return <p>{completed && completion?.orderNumber === '77' ? 'pedido visible' : 'pedido ausente'}</p>;
+  }
+
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items: [{ productId: 'orbita-01', quantity: 1 }] }));
+  render(
+    <MemoryRouter initialEntries={['/checkout/test']}>
+      <CartProvider>
+        <Routes>
+          <Route path="/checkout" element={<CheckoutSession />}>
+            <Route path="test" element={<CompleteAndClear />} />
+            <Route path="listo" element={<SuccessProbe />} />
+          </Route>
+        </Routes>
+      </CartProvider>
+    </MemoryRouter>,
+  );
+  expect(await screen.findByText('pedido visible')).toBeInTheDocument();
 });
 
 it('blocks partial unavailable carts so items are not silently omitted', async () => {

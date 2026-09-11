@@ -7,6 +7,7 @@ import { ProductVisual } from '../components/product/ProductVisual';
 import { formatPrice } from '../components/product/ProductCard';
 import { NotFoundPage } from './NotFoundPage';
 import { MAX_PRODUCT_QUANTITY } from '../cart/constants';
+import { isWooCommerceConfigured } from '../commerce/CommerceProvider';
 
 function ProductDetail({ slug }: { slug: string }) {
   const [product, setProduct] = useState<Product | null | undefined>(null);
@@ -58,7 +59,7 @@ function ProductDetail({ slug }: { slug: string }) {
       <div className="product-detail">
         <div className="product-detail__art">
           <ProductVisual product={product} />
-          <p>Composición gráfica / Envase de muestra</p>
+          <p>Composición gráfica / {isWooCommerceConfigured ? 'Envase de catálogo' : 'Envase de muestra'}</p>
         </div>
         <section
           className="product-detail__info"
@@ -121,19 +122,21 @@ function ProductDetail({ slug }: { slug: string }) {
             <p>
               {product.format} · {product.size}
             </p>
-            <h3>Ingredientes</h3>
-            <ul>
-              {product.ingredients.map((ingredient) => (
-                <li key={ingredient}>{ingredient}</li>
-              ))}
-            </ul>
+            {product.ingredients.length > 0 ? <>
+              <h3>Ingredientes</h3>
+              <ul>
+                {product.ingredients.map((ingredient) => (
+                  <li key={ingredient}>{ingredient}</li>
+                ))}
+              </ul>
+            </> : <p>Consulta la descripción completa del producto para ver sus ingredientes.</p>}
             <div className="lot-line">
-              <span>Lote demostrativo</span>
+              <span>{isWooCommerceConfigured ? 'Lote' : 'Lote demostrativo'}</span>
               <span>{product.lot}</span>
             </div>
           </div>
           <p className="responsible-note">
-            Producto ficticio: ingredientes, presentación y precio de muestra.
+            {!isWooCommerceConfigured && 'Producto ficticio: ingredientes, presentación y precio de muestra. '}
             Esta ficha describe composición, no efectos terapéuticos.
           </p>
         </section>

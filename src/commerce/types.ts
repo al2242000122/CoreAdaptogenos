@@ -15,6 +15,8 @@ export interface Product {
   color: 'lime' | 'mineral' | 'lavender';
   featured: boolean;
   description: string;
+  /** Optional image supplied by the commerce backend. */
+  imageUrl?: string;
 }
 
 export interface ProductFilters {

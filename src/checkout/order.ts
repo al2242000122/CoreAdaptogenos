@@ -54,7 +54,7 @@ export const CHECKOUT_OPTION_VALUES = {
 export type CheckoutField = typeof checkoutFields[number]['name'] | 'shipping' | 'payment';
 export type CheckoutErrors = Partial<Record<CheckoutField, string>>;
 
-export function validateCheckout(values: Record<string, string>): CheckoutErrors {
+export function validateCheckout(values: Record<string, string>, paymentValue: string = CHECKOUT_OPTION_VALUES.payment): CheckoutErrors {
   const errors: CheckoutErrors = {};
   for (const field of checkoutFields) {
     if (!values[field.name]?.trim()) {
@@ -73,6 +73,6 @@ export function validateCheckout(values: Record<string, string>): CheckoutErrors
     errors.postalCode = 'Escribe un código postal de 5 dígitos.';
   }
   if (values.shipping !== CHECKOUT_OPTION_VALUES.shipping) errors.shipping = 'Selecciona una opción de envío.';
-  if (values.payment !== CHECKOUT_OPTION_VALUES.payment) errors.payment = 'Selecciona el pago simulado.';
+  if (values.payment !== paymentValue) errors.payment = 'Selecciona una forma de pago.';
   return errors;
 }

@@ -1,6 +1,6 @@
 # Core Adaptógenos · Botica lunar
 
-Prototipo navegable en español con React, TypeScript y Vite. Incluye catálogo ficticio, filtros, fichas, carrito persistente, revisión para WhatsApp y un checkout simulado. No crea pedidos comerciales ni procesa pagos.
+Prototipo navegable en español con React, TypeScript y Vite. Incluye catálogo, filtros, fichas, carrito persistente, revisión manual por WhatsApp y un checkout que puede crear pedidos reales en WooCommerce (contraentrega o transferencia) cuando se configura `VITE_WOOCOMMERCE_URL`.
 
 ## Uso local
 
@@ -28,7 +28,7 @@ La compilación genera `dist/`. El servidor de destino debe devolver `index.html
 - `LocalCommerceProvider` es exclusivamente de demostración. Las vistas consumen `commerce`, definido en `src/commerce/CommerceProvider.ts`, a través de la interfaz de `src/commerce/types.ts`.
 - El carrito guarda únicamente identificadores y cantidades en la clave `coreadaptogenos-cart` de `localStorage`. Valida los datos al cargar y continúa en memoria si falla el almacenamiento. Puede vaciarse desde el carrito.
 - `VITE_WHATSAPP_NUMBER` es público y viene vacío. Configura explícitamente un número autorizado y verificado del negocio (10–15 dígitos, con código de país) antes de habilitar el enlace externo. Si falta o no cumple el formato, la llamada a la acción permanece oculta y solo se ofrece “Copiar pedido”. El sitio muestra el resumen antes de abrir WhatsApp; la persona decide si envía el mensaje.
-- “Pago en línea” es una simulación: utiliza datos ficticios. El prototipo no los guarda ni los transmite y no pide tarjetas. Aun con `autocomplete="off"`, el navegador puede conservar datos del formulario en su historial según su configuración. Recargar la confirmación no acredita una compra. No hay envío, impuestos ni correos reales.
+- Sin `VITE_WOOCOMMERCE_URL`, “Pago en línea” es una simulación: utiliza datos ficticios. El prototipo no los guarda ni los transmite y no pide tarjetas. Aun con `autocomplete="off"`, el navegador puede conservar datos del formulario en su historial según su configuración. Con WooCommerce configurado, la dirección, el envío y el método offline se envían al Store API; los pagos con tarjeta deben continuar en el checkout nativo de WooCommerce.
 - Nosotros y Diario son contenido de muestra. La historia, el proceso, los textos comerciales y cualquier texto legal necesitan revisión profesional antes de una publicación comercial.
 
 ## Rutas
@@ -37,13 +37,11 @@ La compilación genera `dist/`. El servidor de destino debe devolver `index.html
 
 El menú móvil usa un diálogo de pantalla completa con foco contenido, cierre por Escape, retorno de foco al botón y bloqueo de scroll. Las transiciones de ruta llevan el foco al contenido y restablecen el scroll; los filtros mantienen el foco del control. Se respetan las preferencias de movimiento reducido.
 
-## Handoff a WooCommerce
+## WooCommerce
 
-1. Implementar `WooCommerceProvider` con la interfaz existente (`listProducts(filters?)` y `getProduct(slug)`) usando WooCommerce Store API. Mapear identificadores, slugs, formatos, momentos, ingredientes, lotes, imágenes y precios; adaptar las unidades monetarias de la API al contrato local. Los filtros de ritual son una taxonomía de negocio que debe definirse.
-2. Sustituir la instancia `commerce` manteniendo las vistas. Comprobar carga, error, productos retirados y stock contra el catálogo real. Los lotes de muestra no constituyen trazabilidad real.
-3. Integrar el carrito de Store API y su sesión/token. El subtotal actual se calcula localmente: en producción, WooCommerce debe ser la autoridad de precios, descuentos, existencias, impuestos y envío. Reconciliar el carrito local antes de permitir un pedido.
-4. La interfaz actual cubre lectura del catálogo; no implementa creación de pedidos. Definir esa frontera para el checkout real y sustituir el formulario simulado por el checkout nativo o la integración de Store API. El procesamiento de pagos y sus credenciales pertenecen al proveedor de pago/servidor; nunca colocar secretos en variables `VITE_*`.
-5. Reemplazar el número de WhatsApp y revisar el mensaje con datos comerciales reales. El identificador `CA-...` es una referencia local de demostración, no un número de pedido de WooCommerce. Confirmar disponibilidad, envío y pago manualmente en esa ruta.
+La conexión ya está implementada en `src/commerce/WooCommerceProvider.ts` y `src/commerce/WooCommerceCheckout.ts`. Sin la variable de entorno se conserva el modo local de demostración; con ella, el catálogo se lee desde Store API y el formulario envía dirección, tarifa, método offline y total confirmado a WooCommerce. El carrito del navegador se limpia solo si no cambió mientras se creaba el pedido.
+
+Sigue [docs/woocommerce-setup.md](docs/woocommerce-setup.md) para crear tus productos, configurar CORS, zonas de envío, protección WAF y publicar el build. Stripe/PayPal deben usar el checkout nativo de WooCommerce hasta añadir sus campos y extensión de pago.
 
 Antes de publicar: revisar contenido y accesibilidad con datos reales; configurar HTTPS, la política de datos del negocio y la navegación directa del servidor; ejecutar las pruebas y validar ambos recorridos en el entorno integrado.
 

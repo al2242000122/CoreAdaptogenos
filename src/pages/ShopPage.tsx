@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import type { ProductFormat, RitualMoment } from '../commerce/types';
 import { ProductGrid } from '../components/product/ProductGrid';
+import { isWooCommerceConfigured } from '../commerce/CommerceProvider';
 
 const formats: { value: ProductFormat; label: string }[] = [
   { value: 'extracto', label: 'Extractos' },
@@ -87,8 +88,9 @@ export function ShopPage() {
           filters={{ format, moment }}
         />
         <p className="responsible-note">
-          Catálogo ficticio para explorar la experiencia. Los momentos son una
-          invitación cotidiana, no una recomendación de salud.
+          {isWooCommerceConfigured
+            ? 'Los momentos son una invitación cotidiana, no una recomendación de salud.'
+            : 'Catálogo ficticio para explorar la experiencia. Los momentos son una invitación cotidiana, no una recomendación de salud.'}
         </p>
       </section>
     </div>

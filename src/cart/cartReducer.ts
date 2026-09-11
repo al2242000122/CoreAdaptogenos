@@ -35,5 +35,7 @@ export const cartReducer = (state: CartState, action: CartAction): CartState => 
     }
     case 'remove':
       return { items: state.items.filter((item) => item.productId !== action.productId) };
+    case 'clear':
+      return initialCartState;
   }
 };

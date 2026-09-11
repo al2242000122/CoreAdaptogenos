@@ -20,6 +20,8 @@ interface CartContextValue {
   add: (product: CartProduct, quantity?: number) => void;
   setQuantity: (product: CartProduct, quantity: number) => void;
   remove: (product: CartProduct) => void;
+  clear: () => void;
+  clearIfMatches: (expectedItems: readonly CartItem[]) => boolean;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -119,6 +121,23 @@ export const CartProvider = ({ children }: React.PropsWithChildren) => {
         stateRef.current = cartReducer(stateRef.current, action);
         dispatch(action);
         setAnnouncement(`${product.name} se eliminó de tu carrito.`);
+      },
+      clear: () => {
+        const action = { type: 'clear' } as const;
+        stateRef.current = cartReducer(stateRef.current, action);
+        dispatch(action);
+        setAnnouncement('Tu carrito se vació después de crear el pedido.');
+      },
+      clearIfMatches: (expectedItems) => {
+        const currentItems = stateRef.current.items;
+        const unchanged = currentItems.length === expectedItems.length &&
+          currentItems.every((item, index) => item.productId === expectedItems[index]?.productId && item.quantity === expectedItems[index]?.quantity);
+        if (!unchanged) return false;
+        const action = { type: 'clear' } as const;
+        stateRef.current = cartReducer(stateRef.current, action);
+        dispatch(action);
+        setAnnouncement('Tu carrito se vació después de crear el pedido.');
+        return true;
       },
     }),
     [announcement, catalogStatus, count, products, retryCatalog, state.items, storageWarning, subtotal],

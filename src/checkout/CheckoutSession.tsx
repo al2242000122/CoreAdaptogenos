@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useCart } from '../cart/CartContext';
 import type { CartItem } from '../cart/types';
 import { commerce } from '../commerce/CommerceProvider';
@@ -9,7 +9,43 @@ import { formatOrderPrice } from './whatsapp';
 interface CheckoutSessionValue {
   order: Order;
   completed: boolean;
-  complete: () => void;
+  completion: CheckoutCompletion | null;
+  complete: (completion?: CheckoutCompletion) => void;
+}
+
+export interface CheckoutCompletion {
+  mode: 'simulation' | 'woocommerce';
+  orderNumber?: string;
+  redirectUrl?: string;
+  total?: number;
+}
+
+const CHECKOUT_SESSION_KEY = 'coreadaptogenos-checkout-session';
+const CHECKOUT_SESSION_MAX_AGE = 24 * 60 * 60 * 1000;
+
+interface PersistedCheckout {
+  savedAt: number;
+  order: Order;
+  completion: CheckoutCompletion;
+}
+
+function readPersistedCheckout(restore: boolean): PersistedCheckout | null {
+  if (!restore) return null;
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(CHECKOUT_SESSION_KEY) ?? 'null') as PersistedCheckout | null;
+    if (!parsed || parsed.completion?.mode !== 'woocommerce' || !parsed.order?.lines?.length) return null;
+    return Date.now() - parsed.savedAt <= CHECKOUT_SESSION_MAX_AGE ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearPersistedCheckout() {
+  try {
+    sessionStorage.removeItem(CHECKOUT_SESSION_KEY);
+  } catch {
+    // Storage can be disabled; the in-memory session remains authoritative.
+  }
 }
 
 const CheckoutContext = createContext<CheckoutSessionValue | undefined>(undefined);
@@ -22,17 +58,23 @@ export function useCheckout() {
 
 export function CheckoutSession() {
   const { items } = useCart();
-  // A cart change starts a new snapshot; navigating between checkout steps does not.
-  return <ResolvedCheckout key={JSON.stringify(items)} items={items} />;
+  const { pathname } = useLocation();
+  return <ResolvedCheckout items={items} restoreCompletion={pathname.endsWith('/listo')} />;
 }
 
-function ResolvedCheckout({ items }: { items: CartItem[] }) {
-  const [order, setOrder] = useState<Order | null>(null);
+function ResolvedCheckout({ items, restoreCompletion }: { items: CartItem[]; restoreCompletion: boolean }) {
+  const [restored] = useState(() => readPersistedCheckout(restoreCompletion));
+  const [order, setOrder] = useState<Order | null>(() => restored?.order ?? null);
   const [error, setError] = useState('');
-  const [completed, setCompleted] = useState(false);
+  const [completion, setCompletion] = useState<CheckoutCompletion | null>(() => restored?.completion ?? null);
 
   useEffect(() => {
-    if (!items.length) return;
+    if (completion) return;
+    if (!items.length) {
+      setOrder(null);
+      setError('');
+      return;
+    }
     let current = true;
     void commerce.listProducts().then((products) => {
       if (!current) return;
@@ -55,10 +97,30 @@ function ResolvedCheckout({ items }: { items: CartItem[] }) {
       if (current) setError('No pudimos cargar tus fórmulas. Vuelve al carrito e inténtalo otra vez.');
     });
     return () => { current = false; };
-  }, [items]);
+  }, [completion, items]);
+
+  useEffect(() => {
+    if (!completion || completion.mode !== 'woocommerce' || !order) return;
+    try {
+      sessionStorage.setItem(CHECKOUT_SESSION_KEY, JSON.stringify({ savedAt: Date.now(), order, completion } satisfies PersistedCheckout));
+    } catch {
+      // Storage is optional; the current route still shows the confirmation.
+    }
+  }, [completion, order]);
+
+  const complete = (next: CheckoutCompletion = { mode: 'simulation' }) => {
+    setCompletion(next);
+    if (next.mode !== 'woocommerce') clearPersistedCheckout();
+  };
 
   let content;
-  if (!items.length) {
+  if (completion && order) {
+    content = (
+      <CheckoutContext.Provider value={{ order, completed: true, completion, complete }}>
+        <Outlet />
+      </CheckoutContext.Provider>
+    );
+  } else if (!items.length) {
     content = (
       <section className="checkout-recovery">
         <h1>Tu carrito está en pausa</h1>
@@ -78,7 +140,7 @@ function ResolvedCheckout({ items }: { items: CartItem[] }) {
     content = <p role="status">Reuniendo tu pedido…</p>;
   } else {
     content = (
-      <CheckoutContext.Provider value={{ order, completed, complete: () => setCompleted(true) }}>
+      <CheckoutContext.Provider value={{ order, completed: Boolean(completion), completion, complete }}>
         <Outlet />
       </CheckoutContext.Provider>
     );
@@ -87,7 +149,10 @@ function ResolvedCheckout({ items }: { items: CartItem[] }) {
 }
 
 export function OrderSummary() {
-  const { order } = useCheckout();
+  const { order, completion } = useCheckout();
+  const confirmedTotal = completion?.mode === 'woocommerce' && completion.total !== undefined
+    ? completion.total
+    : order.subtotal;
   return (
     <section className="order-summary" aria-labelledby="order-summary-title">
       <p className="eyebrow">Selección / {order.id}</p>
@@ -101,8 +166,12 @@ export function OrderSummary() {
           </li>
         ))}
       </ul>
-      <p className="order-subtotal"><span>Subtotal</span><strong>{formatOrderPrice(order.subtotal)}</strong></p>
-      <p className="checkout-note">Envío por confirmar. Este subtotal no incluye el envío.</p>
+      <p className="order-subtotal"><span>{completion?.mode === 'woocommerce' && completion.total !== undefined ? 'Total confirmado' : 'Subtotal'}</span><strong>{formatOrderPrice(confirmedTotal)}</strong></p>
+      <p className="checkout-note">
+        {completion?.mode === 'woocommerce' && completion.total !== undefined
+          ? 'Total calculado por WooCommerce; incluye los cargos aplicables al destino.'
+          : 'Envío por confirmar. Este subtotal no incluye el envío.'}
+      </p>
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { isWooCommerceConfigured } from '../commerce/CommerceProvider';
 import { ProductGrid } from '../components/product/ProductGrid';
 import { ProductVisual } from '../components/product/ProductVisual';
 
@@ -122,8 +123,7 @@ export function HomePage() {
             <span>03</span>
             <h3>Lote</h3>
             <p>
-              Una referencia para cada fórmula. Explora los lotes demostrativos
-              del catálogo.
+              Una referencia para cada fórmula. Explora los {isWooCommerceConfigured ? 'lotes del catálogo' : 'lotes demostrativos del catálogo'}.
             </p>
           </article>
         </div>

@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom';
 import { commerce } from '../../commerce/CommerceProvider';
 import type { Product, ProductFilters } from '../../commerce/types';
 import { ProductCard } from './ProductCard';
+import { isWooCommerceConfigured } from '../../commerce/CommerceProvider';
 
 interface ProductGridProps {
   filters?: ProductFilters;
   featured?: boolean;
 }
+
+const FEATURED_FALLBACK_COUNT = 3;
 
 export function ProductGrid({ filters, featured = false }: ProductGridProps) {
   const [products, setProducts] = useState<Product[] | null>(null);
@@ -19,10 +22,10 @@ export function ProductGrid({ filters, featured = false }: ProductGridProps) {
     let current = true;
     void commerce.listProducts({ format, moment }).then(
       (result) => {
-        if (current)
-          setProducts(
-            featured ? result.filter((product) => product.featured) : result,
-          );
+        if (current) {
+          const featuredProducts = result.filter((product) => product.featured);
+          setProducts(featured ? (featuredProducts.length ? featuredProducts : result.slice(0, FEATURED_FALLBACK_COUNT)) : result);
+        }
       },
       () => {
         if (current) setFailed(true);
@@ -59,7 +62,7 @@ export function ProductGrid({ filters, featured = false }: ProductGridProps) {
       {!featured && (
         <p role="status" className="result-count">
           {products.length} {products.length === 1 ? 'fórmula' : 'fórmulas'} /
-          Colección de muestra
+          {isWooCommerceConfigured ? 'Catálogo WooCommerce' : 'Colección de muestra'}
         </p>
       )}
       <div

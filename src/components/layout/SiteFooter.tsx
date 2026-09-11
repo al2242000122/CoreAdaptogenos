@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { isWooCommerceConfigured } from '../../commerce/CommerceProvider';
 
 export function SiteFooter() {
   return (
@@ -15,8 +16,8 @@ export function SiteFooter() {
       </div>
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} Core Adaptógenos</p>
-        <p>Catálogo de muestra · Precios en MXN</p>
-        <p>Fórmulas ficticias. Sin promesas terapéuticas.</p>
+          <p>{isWooCommerceConfigured ? 'Catálogo WooCommerce · Precios en MXN' : 'Catálogo de muestra · Precios en MXN'}</p>
+        <p>{isWooCommerceConfigured ? 'Información de producto bajo responsabilidad de la marca. Sin promesas terapéuticas.' : 'Fórmulas ficticias. Sin promesas terapéuticas.'}</p>
       </div>
     </footer>
   );

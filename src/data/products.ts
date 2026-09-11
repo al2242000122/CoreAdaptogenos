@@ -14,6 +14,7 @@ export const products: Product[] = [
     lot: 'L-ORB-01',
     color: 'lime',
     featured: true,
+    imageUrl: '/products/orbita-01.png',
     description: 'Extractos de reishi y cordyceps en una base vegetal de textura ligera.',
   },
   {
@@ -29,6 +30,7 @@ export const products: Product[] = [
     lot: 'L-PUL-02',
     color: 'mineral',
     featured: true,
+    imageUrl: '/products/pulso-02.png',
     description: 'Mezcla seca de cacao, canela y maca con un perfil cálido y terroso.',
   },
   {
@@ -44,6 +46,7 @@ export const products: Product[] = [
     lot: 'L-UMB-03',
     color: 'lavender',
     featured: false,
+    imageUrl: '/products/umbral-03.png',
     description: 'Cacao molido con reishi y vainilla natural, de composición redonda y suave.',
   },
   {
@@ -59,6 +62,7 @@ export const products: Product[] = [
     lot: 'L-HAL-04',
     color: 'mineral',
     featured: false,
+    imageUrl: '/products/halo-04.png',
     description: 'Extractos botánicos de melena de león y tulsi en una fórmula acuosa.',
   },
   {
@@ -74,6 +78,7 @@ export const products: Product[] = [
     lot: 'L-NEB-05',
     color: 'lime',
     featured: true,
+    imageUrl: '/products/nebula-05.png',
     description: 'Mezcla de ashwagandha, cacao y cardamomo con notas especiadas.',
   },
   {
@@ -89,6 +94,7 @@ export const products: Product[] = [
     lot: 'L-SAV-06',
     color: 'lavender',
     featured: false,
+    imageUrl: '/products/savia-06.png',
     description: 'Cacao criollo con maca y una nota mineral, molido para mezclar.',
   },
 ];
