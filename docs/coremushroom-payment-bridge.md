@@ -8,7 +8,9 @@
   Usar el checkout nativo del pedido receptor; el formulario React no captura
   tarjetas. La elección no confirma aprobación de la cuenta ni del catálogo.
 - Dominio definitivo: pendiente. `docs/woocommerce-setup.md` identifica un
-  host temporal de Hostinger; falta comprobar su instalación y acceso.
+  host temporal de Hostinger; se confirmó acceso al panel WordPress 7.1 y
+  WooCommerce activo. Se instaló y activó WooCommerce Stripe Gateway 11.0.0;
+  cuenta, modo de pruebas y webhooks todavía no conectados ni verificados.
 - OXXO: condicionado a disponibilidad real en la cuenta y extensión elegidas.
 
 ## Pantalla preparada
