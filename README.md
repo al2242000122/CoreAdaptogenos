@@ -1,5 +1,9 @@
 # Core Adaptógenos · Botica lunar
 
+La pantalla receptora de pagos externos de CoreMushroom y sus condiciones de
+activación están en [docs/coremushroom-payment-bridge.md](docs/coremushroom-payment-bridge.md).
+Está inactiva hasta configurar un backend y una pasarela real aprobada.
+
 Prototipo navegable en español con React, TypeScript y Vite. Incluye catálogo, filtros, fichas, carrito persistente, revisión manual por WhatsApp y un checkout que puede crear pedidos reales en WooCommerce (contraentrega o transferencia) cuando se configura `VITE_WOOCOMMERCE_URL`.
 
 ## Uso local

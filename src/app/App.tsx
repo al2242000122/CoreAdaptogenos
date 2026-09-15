@@ -11,6 +11,7 @@ import { CheckoutChoicePage } from '../pages/CheckoutChoicePage';
 import { WhatsAppReviewPage } from '../pages/WhatsAppReviewPage';
 import { NormalCheckoutPage } from '../pages/NormalCheckoutPage';
 import { CheckoutSuccessPage } from '../pages/CheckoutSuccessPage';
+import { CoreMushroomPaymentPage } from '../pages/CoreMushroomPaymentPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { AboutPage } from '../pages/AboutPage';
 import { JournalPage } from '../pages/JournalPage';
@@ -57,6 +58,7 @@ export function App() {
             <Route path="normal" element={<NormalCheckoutPage />} />
             <Route path="listo" element={<CheckoutSuccessPage />} />
           </Route>
+          <Route path="/pago/coremushroom/:session" element={<CoreMushroomPaymentPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <CartFeedback />
