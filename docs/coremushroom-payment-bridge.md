@@ -2,8 +2,9 @@
 
 ## Decisiones confirmadas el 15 de septiembre de 2026
 
-- Backend: WordPress/WooCommerce. Este repositorio contiene el frontend y el
-  cliente Store API; todavía no contiene el plugin servidor del puente.
+- Backend: WordPress/WooCommerce. Este repositorio contiene el frontend, el
+  cliente Store API y el plugin servidor en
+  `wordpress-plugin/coreadaptogenos-coremushroom-bridge/`.
 - Pasarela elegida: Stripe mediante su extensión oficial para WooCommerce.
   Usar el checkout nativo del pedido receptor; el formulario React no captura
   tarjetas. La elección no confirma aprobación de la cuenta ni del catálogo.
@@ -15,45 +16,64 @@
   modo de pruebas y webhooks todavía no conectados ni verificados.
 - OXXO: condicionado a disponibilidad real en la cuenta y extensión elegidas.
 
-## Pantalla preparada
+## Puente implementado
+
+El plugin receptor expone `POST /wp-json/coreadaptogenos/v1/payment-sessions`.
+Valida HMAC SHA-256, antigüedad de cinco minutos, nonce atómico, origen exacto,
+MXN, total en centavos y artículos reales. Crea mediante CRUD de WooCommerce
+un pedido espejo de solo pago y devuelve su URL nativa `order-pay`, firmada.
+En ese pedido deja únicamente el gateway oficial `stripe`, evita una segunda
+reducción de inventario y suprime los correos duplicados de WooCommerce.
+
+Cuando el webhook oficial de Stripe completa, reembolsa o revierte el pedido
+receptor, el plugin envía un callback firmado e idempotente a CoreMushroom. El
+acuse JSON debe confirmar el evento y ambos pedidos exactos; una respuesta
+HTML con código 200 se trata como fallo. Si el origen no responde, usa Action
+Scheduler con reintentos. El regreso del navegador no confirma el pago.
+
+El endpoint permanece cerrado hasta guardar el mismo secreto en ambos sitios
+y activar el puente en WooCommerce → Puente CoreMushroom. El secreto nunca se
+incluye en Git ni se vuelve a imprimir en el formulario de administración.
+
+## Pantalla preparada para una fase posterior
 
 La ruta `/pago/coremushroom/:session` ya existe en este frontend. No acepta
 importe, pedido, correo ni datos bancarios en la URL. La sesión es un valor
 hexadecimal aleatorio de al menos 128 bits. Sin servidor receptor configurado,
 solo muestra que el método no está disponible y permite volver a CoreMushroom.
 
-Para habilitarla se necesitan **dos componentes servidor**, además del frontend:
+La primera versión operativa redirige directamente a `order-pay`; no depende
+de desplegar el prototipo React. La ruta React queda preparada para una futura
+pantalla intermedia y no participa en la confirmación del pago.
 
-1. CoreMushroom crea el pedido y expone los datos reales de sesión solo mediante
-   una llamada autenticada desde CoreAdaptogenos. La respuesta incluye el
-   pedido, importe entero en centavos, `MXN`, artículos reales, vigencia y
-   método; la URL pública contiene únicamente el identificador opaco.
-2. El backend de CoreAdaptogenos recupera y valida esos datos, crea el checkout
-   alojado mediante el plugin o API oficial del procesador aprobado y entrega
-   una respuesta de lectura `GET /wp-json/coreadaptogenos/v1/payment-sessions/:id`
-   con esta estructura pública, sin información personal:
+El intercambio entre servidores funciona así:
+
+1. CoreMushroom crea su pedido, deriva una sesión opaca estable para ese pedido
+   y envía por HTTPS una
+   solicitud firmada con el total exacto, los artículos y la facturación mínima.
+2. CoreAdaptogenos valida firma, vigencia, entorno test/live y total exacto.
+   La pareja origen/pedido solo puede tener una sesión y cada sesión solo puede
+   tener un pedido espejo. Después devuelve una
+   respuesta 201 firmada con esta estructura:
 
    ```json
    {
-     "session_id": "0123456789abcdef0123456789abcdef",
+     "session": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+     "receiver_order_id": 87,
      "amount_minor": 90000,
      "currency": "MXN",
-     "method": "card",
-     "expires_at": "2030-01-01T12:00:00Z",
-     "merchant": "CoreAdaptogenos",
-     "descriptor": "COREADAPTOGENOS",
-     "checkout_url": "https://host-aprobado.example/checkout/token"
+     "environment": "test",
+     "checkout_url": "https://coreadaptogenos.app/finalizar-compra/order-pay/87/?key=wc_...",
+     "signature": "hmac_sha256_..."
    }
    ```
 
-El ejemplo es un **contrato de desarrollo**, no un cobro activo. La ruta
-verifica identificador, importe positivo entero, MXN, método, vencimiento,
-identidad del cobrador y hostname HTTPS exacto. El hostname permitido se fija
-en `VITE_COREMUSHROOM_PAYMENT_HOSTS`; la ruta de lectura se fija en
-`VITE_COREMUSHROOM_BRIDGE_API` y debe ser una ruta del mismo origen que el
-frontend. Las dos variables siguen vacías mientras el backend no exista.
-La respuesta del backend debe llevar `Cache-Control: no-store` y no incluir
-datos personales; el frontend también pide la sesión sin usar caché.
+El ejemplo es el contrato de la versión 1, todavía cerrado en producción. El
+plugin verifica identificador, importe positivo entero, MXN, método, origen y
+hostname HTTPS exacto. Las variables `VITE_COREMUSHROOM_PAYMENT_HOSTS` y
+`VITE_COREMUSHROOM_BRIDGE_API` solo se usarán si después se despliega la
+pantalla React intermedia; permanecen vacías en esta primera versión. La
+respuesta lleva `Cache-Control: no-store`.
 
 El backend receptor valida la firma, marca de tiempo y nonce de cada solicitud
 servidor a servidor; no devuelve checkout para un importe o pedido distinto.
@@ -66,8 +86,9 @@ dominio que origina el pedido. No usar este frontend para aparentar una venta
 distinta a la real. El alcance y las pruebas exigidas están en
 `CoreMushroom/docs/pagos-coreadaptogenos.md`.
 
-Pendiente: propagación DNS y SSL del dominio definitivo, aprobación de Stripe
-para este catálogo, descriptor bancario, sandbox y conciliación.
+Pendiente: propagación DNS y SSL del dominio definitivo, instalación del plugin
+receptor, secreto compartido, conexión de Stripe en pruebas, aprobación para
+este catálogo, descriptor bancario y conciliación.
 Ninguno de esos datos se inventa ni se publica en este repositorio.
 
 ## Preparación del servidor receptor
@@ -76,9 +97,9 @@ Ninguno de esos datos se inventa ni se publica en este repositorio.
 2. Instalar la [extensión oficial de Stripe](https://woocommerce.com/document/stripe/setup-and-configuration/).
 3. Conectar la cuenta en [modo de pruebas](https://woocommerce.com/document/stripe/customer-experience/testing/)
    y verificar sus [webhooks](https://woocommerce.com/document/stripe/setup-and-configuration/stripe-webhooks/).
-4. Implementar los dos componentes del puente descritos arriba. El pedido
-   receptor debe conservar los artículos reales, importe, moneda y origen;
-   no reemplazar el catálogo por un producto genérico de cobro.
+4. Instalar el ZIP generado desde
+   `wordpress-plugin/coreadaptogenos-coremushroom-bridge/`, guardar el secreto
+   compartido y activar el endpoint.
 5. Probar pago aprobado/rechazado, reintentos, vencimiento, importe alterado y
    reembolsos entre ambos pedidos antes de habilitarlo en CoreMushroom.
 

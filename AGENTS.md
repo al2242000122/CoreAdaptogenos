@@ -1,5 +1,24 @@
 # context-mode — MANDATORY routing rules
 
+## Puente de pago CoreMushroom
+
+- El receptor WordPress vive en `https://coreadaptogenos.app`; mientras DNS y
+  SSL terminan usa el host temporal de Hostinger solo para administración.
+- El plugin está en
+  `wordpress-plugin/coreadaptogenos-coremushroom-bridge/`. No se guardan
+  secretos, pedidos ni datos de clientes en este repositorio público.
+- CoreMushroom conserva el pedido comercial. Este WooCommerce crea un pedido
+  espejo de solo pago con los artículos reales y Stripe como único gateway.
+- El navegador nunca confirma un pago. La confirmación nace en el webhook de
+  Stripe, se aplica al pedido espejo y vuelve por callback HMAC idempotente.
+- La sesión es estable por pedido, expira en una hora y está ligada al entorno
+  real de Stripe (test o live). El receptor propaga pago, reembolso y
+  reversión; solo acepta como entrega un acuse JSON con los identificadores
+  exactos.
+- El endpoint falla cerrado sin secreto compartido, origen HTTPS exacto y
+  activación explícita. OXXO no forma parte de la primera versión.
+- Verificación local: `php wordpress-plugin/coreadaptogenos-coremushroom-bridge/tests/run.php`.
+
 context-mode MCP tools are available. Use them to keep large tool output out of the context window. Codex hooks provide runtime enforcement when `[features].hooks = true`; these project rules provide model-side routing.
 
 ## Think in Code
