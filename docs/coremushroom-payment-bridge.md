@@ -7,10 +7,12 @@
 - Pasarela elegida: Stripe mediante su extensión oficial para WooCommerce.
   Usar el checkout nativo del pedido receptor; el formulario React no captura
   tarjetas. La elección no confirma aprobación de la cuenta ni del catálogo.
-- Dominio definitivo: pendiente. `docs/woocommerce-setup.md` identifica un
-  host temporal de Hostinger; se confirmó acceso al panel WordPress 7.1 y
-  WooCommerce activo. Se instaló y activó WooCommerce Stripe Gateway 11.0.0;
-  cuenta, modo de pruebas y webhooks todavía no conectados ni verificados.
+- Dominio definitivo: `https://coreadaptogenos.app`. Se registró en Name.com
+  y se conectó al WordPress receptor de Hostinger el 16 de septiembre de 2026.
+  Los nameservers configurados son `aurora.dns-parking.com` y
+  `nebula.dns-parking.com`; DNS y SSL pueden tardar hasta 24 horas. Se confirmó
+  WooCommerce activo y se instaló WooCommerce Stripe Gateway 11.0.0; cuenta,
+  modo de pruebas y webhooks todavía no conectados ni verificados.
 - OXXO: condicionado a disponibilidad real en la cuenta y extensión elegidas.
 
 ## Pantalla preparada
@@ -64,8 +66,8 @@ dominio que origina el pedido. No usar este frontend para aparentar una venta
 distinta a la real. El alcance y las pruebas exigidas están en
 `CoreMushroom/docs/pagos-coreadaptogenos.md`.
 
-Pendiente: dominio HTTPS definitivo, acceso al WordPress receptor, aprobación
-de Stripe para este catálogo, descriptor bancario, sandbox y conciliación.
+Pendiente: propagación DNS y SSL del dominio definitivo, aprobación de Stripe
+para este catálogo, descriptor bancario, sandbox y conciliación.
 Ninguno de esos datos se inventa ni se publica en este repositorio.
 
 ## Preparación del servidor receptor

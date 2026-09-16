@@ -9,13 +9,13 @@ El frontend puede trabajar en dos modos:
 
 1. En el panel de WooCommerce crea tus productos reales y publícalos. El SKU se muestra como referencia de fórmula; usa las categorías `Extractos`, `Mezclas` o `Cacao` y las etiquetas `Mañana`, `Cotidiano`, `Noche` y opcionalmente `Destacado` para que los filtros y la portada del frontend se completen automáticamente.
 2. En WooCommerce activa al menos un método offline (`Contra reembolso` o `Transferencia bancaria`). El formulario propio admite esos dos métodos; si después instalas Stripe o PayPal, usa el checkout nativo de WooCommerce para esos pagos.
-3. Permite solicitudes CORS desde el dominio público del frontend hacia `https://dodgerblue-gaur-896468.hostingersite.com`. Debe permitirse `GET, POST, OPTIONS`, los encabezados `Content-Type, Cart-Token` y la exposición de `Cart-Token, X-WP-TotalPages`. No compartas claves REST ni credenciales en el frontend.
+3. Permite solicitudes CORS desde el dominio público del frontend hacia `https://coreadaptogenos.app`. Debe permitirse `GET, POST, OPTIONS`, los encabezados `Content-Type, Cart-Token` y la exposición de `Cart-Token, X-WP-TotalPages`. No compartas claves REST ni credenciales en el frontend.
 4. Copia `.env.example` a `.env.production` y define:
 
    ```text
-   VITE_WOOCOMMERCE_URL=https://tu-dominio-de-woocommerce.example
+   VITE_WOOCOMMERCE_URL=https://coreadaptogenos.app
    VITE_WOO_PAYMENT_METHOD=cod
-   VITE_WOO_ALLOWED_PAYMENT_HOSTS=tu-dominio-de-woocommerce.example
+   VITE_WOO_ALLOWED_PAYMENT_HOSTS=coreadaptogenos.app
    VITE_WHATSAPP_NUMBER=521XXXXXXXXXX
    ```
 
