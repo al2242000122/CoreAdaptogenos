@@ -11,7 +11,8 @@
 - Dominio definitivo: `https://coreadaptogenos.app`. Se registró en Name.com
   y se conectó al WordPress receptor de Hostinger el 16 de septiembre de 2026.
   Los nameservers configurados son `aurora.dns-parking.com` y
-  `nebula.dns-parking.com`; DNS y SSL pueden tardar hasta 24 horas. Se confirmó
+  `nebula.dns-parking.com`; DNS y HTTPS se verificaron el 19 de septiembre de
+  2026. Se confirmó
   WooCommerce activo y se instaló WooCommerce Stripe Gateway 11.0.0; cuenta,
   modo de pruebas y webhooks todavía no conectados ni verificados.
 - OXXO: condicionado a disponibilidad real en la cuenta y extensión elegidas.
@@ -86,9 +87,13 @@ dominio que origina el pedido. No usar este frontend para aparentar una venta
 distinta a la real. El alcance y las pruebas exigidas están en
 `CoreMushroom/docs/pagos-coreadaptogenos.md`.
 
-Pendiente: propagación DNS y SSL del dominio definitivo, instalación del plugin
-receptor, secreto compartido, conexión de Stripe en pruebas, aprobación para
-este catálogo, descriptor bancario y conciliación.
+El plugin receptor ya está instalado y activado en el WordPress de Hostinger;
+el secreto compartido está guardado en ambos paneles y la pasarela emisora
+sigue oculta. La ruta REST responde 401 a solicitudes sin firma.
+
+Pendiente: iniciar sesión en el WordPress del dominio definitivo, conexión de
+Stripe en pruebas, aprobación para este catálogo, descriptor bancario y
+conciliación de un recorrido completo con sus webhooks.
 Ninguno de esos datos se inventa ni se publica en este repositorio.
 
 ## Preparación del servidor receptor

@@ -2,8 +2,9 @@
 
 ## Puente de pago CoreMushroom
 
-- El receptor WordPress vive en `https://coreadaptogenos.app`; mientras DNS y
-  SSL terminan usa el host temporal de Hostinger solo para administración.
+- El receptor WordPress vive en `https://coreadaptogenos.app`; DNS y HTTPS se
+  verificaron el 19 de septiembre de 2026. Usar el dominio definitivo también
+  para la conexión de Stripe y las pruebas del puente.
 - El plugin está en
   `wordpress-plugin/coreadaptogenos-coremushroom-bridge/`. No se guardan
   secretos, pedidos ni datos de clientes en este repositorio público.
