@@ -30,6 +30,11 @@
 - El 21 de septiembre de 2026 se activaron en Stripe las transferencias
   automáticas diarias sin saldo mínimo retenido. No guardar datos de la cuenta
   bancaria vinculada en este repositorio público.
+- El 21 de septiembre se verificaron los escenarios de rechazo y reembolso. En
+  el rechazo, el espejo #32 quedó «Fallido» y el pedido CoreMushroom #56 siguió
+  pendiente de pago. En el reembolso, Stripe devolvió íntegramente el cargo
+  simulado de $900, el espejo #27 quedó «Reembolsado» y el callback firmado
+  actualizó CoreMushroom #55 al mismo estado. No hubo dinero real.
 - Verificación local: `php wordpress-plugin/coreadaptogenos-coremushroom-bridge/tests/run.php`.
 
 context-mode MCP tools are available. Use them to keep large tool output out of the context window. Codex hooks provide runtime enforcement when `[features].hooks = true`; these project rules provide model-side routing.

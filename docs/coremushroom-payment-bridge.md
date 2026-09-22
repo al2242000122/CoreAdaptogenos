@@ -99,8 +99,12 @@ portada estática propia en CoreAdaptogenos y se retiraron el contenido inicial
 de WordPress y los marcadores `trans-*` del pie.
 
 El 21 de septiembre se activaron transferencias automáticas diarias sin saldo
-mínimo retenido. Pendiente: obtener la aprobación del catálogo y la relación
-entre ambos dominios, y probar rechazo y reembolso.
+mínimo retenido. Ese día se completó un rechazo controlado: CoreMushroom #56
+quedó pendiente y el espejo #32 quedó fallido. También se reembolsó íntegramente
+el cargo simulado de $900; el espejo #27 y CoreMushroom #55 quedaron
+reembolsados mediante el webhook oficial y el callback firmado. No hubo dinero
+real. Pendiente: obtener la aprobación del catálogo y la relación entre ambos
+dominios, y después cambiar ambos lados a producción.
 Ninguno de esos datos se inventa ni se publica en este repositorio.
 
 ## Preparación del servidor receptor
