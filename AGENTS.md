@@ -10,6 +10,10 @@
 - El receptor WordPress vive en `https://coreadaptogenos.app`; DNS y HTTPS se
   verificaron el 19 de septiembre de 2026. Usar el dominio definitivo también
   para la conexión de Stripe y las pruebas del puente.
+- El 21 de septiembre de 2026 se publicó una portada estática propia en ese
+  WordPress. Identifica a CoreAdaptogenos como procesador de pagos de pedidos
+  CoreMushroom, explica Stripe, el importe verificado y el regreso al pedido,
+  y muestra el WhatsApp compartido. El pie ya no contiene marcadores `trans-*`.
 - El plugin está en
   `wordpress-plugin/coreadaptogenos-coremushroom-bridge/`. No se guardan
   secretos, pedidos ni datos de clientes en este repositorio público.
