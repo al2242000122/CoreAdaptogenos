@@ -8,7 +8,8 @@ it('ships without an active WhatsApp destination and documents explicit verifica
   const readme = readFileSync(resolve(process.cwd(), 'README.md'), 'utf8');
 
   expect(envExample).toMatch(/^VITE_WHATSAPP_NUMBER=\s*$/m);
-  expect(readme).toMatch(/configura explícitamente.*número.*verificado/i);
+  expect(readme).toMatch(/220 644 6651/);
+  expect(readme).toMatch(/configúralo.*únicamente al publicar un catálogo real/i);
   expect(readme).toMatch(/prototipo no (?:los )?guarda ni los transmite.*navegador puede conservar/i);
 });
 

@@ -12,6 +12,9 @@ export function SiteFooter() {
           <span className="eyebrow">Botica lunar / México</span>
           <p>Un espacio para volver a ti.</p>
           <Link to="/nosotros">Conoce nuestra historia ↗</Link>
+          {isWooCommerceConfigured && (
+            <p><a href="https://wa.me/522206446651" target="_blank" rel="noopener noreferrer">WhatsApp: 220 644 6651 ↗</a></p>
+          )}
         </div>
       </div>
       <div className="footer-bottom">

@@ -2,6 +2,11 @@
 
 ## Puente de pago CoreMushroom
 
+- El WhatsApp Business público para ambas marcas es 220 644 6651. Enlaces
+  internacionales: `https://wa.me/522206446651`. El frontend de muestra no
+  debe activar pedidos por WhatsApp con productos ficticios; configura
+  `VITE_WHATSAPP_NUMBER` solo junto con el catálogo WooCommerce real.
+
 - El receptor WordPress vive en `https://coreadaptogenos.app`; DNS y HTTPS se
   verificaron el 19 de septiembre de 2026. Usar el dominio definitivo también
   para la conexión de Stripe y las pruebas del puente.
