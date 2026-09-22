@@ -98,8 +98,9 @@ ambos pedidos quedaron en «Procesando». El 21 de septiembre se publicó una
 portada estática propia en CoreAdaptogenos y se retiraron el contenido inicial
 de WordPress y los marcadores `trans-*` del pie.
 
-Pendiente: configurar y verificar liquidaciones, obtener la aprobación del
-catálogo y la relación entre ambos dominios, y probar rechazo y reembolso.
+El 21 de septiembre se activaron transferencias automáticas diarias sin saldo
+mínimo retenido. Pendiente: obtener la aprobación del catálogo y la relación
+entre ambos dominios, y probar rechazo y reembolso.
 Ninguno de esos datos se inventa ni se publica en este repositorio.
 
 ## Preparación del servidor receptor
