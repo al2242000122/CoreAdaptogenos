@@ -7,7 +7,7 @@ define( 'HOUR_IN_SECONDS', 3600 );
 
 final class CACM_Settings {
 	public static function origin(): string {
-		return 'https://core.bancodeesporas.com';
+		return 'https://coremushroom.com.mx';
 	}
 
 	public static function stripe_environment(): string {

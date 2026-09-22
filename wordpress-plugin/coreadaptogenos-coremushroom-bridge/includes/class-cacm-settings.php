@@ -23,7 +23,7 @@ final class CACM_Settings {
 
 	public static function origin(): string {
 		$settings = self::get();
-		return untrailingslashit( (string) ( $settings['origin'] ?? 'https://core.bancodeesporas.com' ) );
+		return untrailingslashit( (string) ( $settings['origin'] ?? 'https://coremushroom.com.mx' ) );
 	}
 
 	/** Entorno que realmente usa el plugin oficial de Stripe. */
@@ -44,8 +44,8 @@ final class CACM_Settings {
 		$current = self::get();
 		$origin  = untrailingslashit( esc_url_raw( wp_unslash( $_POST['origin'] ?? '' ) ) );
 		$secret  = trim( (string) wp_unslash( $_POST['secret'] ?? '' ) );
-		if ( ! CACM_Url_Allowlist::is_allowed( $origin, 'https://core.bancodeesporas.com' ) ) {
-			$origin = 'https://core.bancodeesporas.com';
+		if ( ! CACM_Url_Allowlist::is_allowed( $origin, 'https://coremushroom.com.mx' ) ) {
+			$origin = 'https://coremushroom.com.mx';
 		}
 		if ( '' === $secret ) {
 			$secret = (string) ( $current['secret'] ?? '' );

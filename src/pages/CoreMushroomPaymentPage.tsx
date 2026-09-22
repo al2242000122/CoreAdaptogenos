@@ -77,7 +77,7 @@ function PaymentSession({ session, apiPath, allowedHosts }: {
     {visibleStatus === 'loading' && <p>Verificando la sesión de pago…</p>}
     {visibleStatus === 'unavailable' && <p>Este método todavía no está disponible. Vuelve a CoreMushroom y elige SPEI.</p>}
     {visibleStatus === 'invalid' && <p>No se pudo verificar la sesión. Vuelve a CoreMushroom para revisar tu pedido.</p>}
-    {visibleStatus !== 'ready' && <a className="button-secondary" href="https://core.bancodeesporas.com/mi-cuenta/">Volver a CoreMushroom</a>}
+    {visibleStatus !== 'ready' && <a className="button-secondary" href="https://coremushroom.com.mx/mi-cuenta/">Volver a CoreMushroom</a>}
     {visibleStatus === 'ready' && details && <>
       <p><strong>Cobrador:</strong> {details.merchant} · <strong>Descriptor:</strong> {details.descriptor}</p>
       <p><strong>Monto:</strong> {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(details.amount_minor / 100)}</p>

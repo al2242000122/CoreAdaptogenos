@@ -178,8 +178,8 @@ cacm_test(
 	static function (): void {
 		cacm_assert_true(
 			CACM_Url_Allowlist::is_allowed(
-				'https://core.bancodeesporas.com/finalizar-compra/order-received/42?key=wc_abc',
-				'https://core.bancodeesporas.com'
+				'https://coremushroom.com.mx/finalizar-compra/order-received/42?key=wc_abc',
+				'https://coremushroom.com.mx'
 			)
 		);
 	}
@@ -191,15 +191,15 @@ cacm_test(
 		cacm_assert_same(
 			false,
 			CACM_Url_Allowlist::is_allowed(
-				'https://core.bancodeesporas.com.evil.test/retorno',
-				'https://core.bancodeesporas.com'
+				'https://coremushroom.com.mx.evil.test/retorno',
+				'https://coremushroom.com.mx'
 			)
 		);
 		cacm_assert_same(
 			false,
 			CACM_Url_Allowlist::is_allowed(
-				'http://core.bancodeesporas.com/retorno',
-				'https://core.bancodeesporas.com'
+				'http://coremushroom.com.mx/retorno',
+				'https://coremushroom.com.mx'
 			)
 		);
 	}
@@ -239,14 +239,14 @@ cacm_test(
 				'phone' => '5555555555', 'country' => 'MX', 'state' => 'CMX', 'city' => 'Ciudad de México',
 				'postcode' => '01000', 'address_1' => 'Calle Uno 10', 'address_2' => '',
 			),
-			'return_url'      => 'https://core.bancodeesporas.com/finalizar-compra/order-received/99',
-			'callback_url'    => 'https://core.bancodeesporas.com/wp-json/coremushroom/v1/payment-events',
+			'return_url'      => 'https://coremushroom.com.mx/finalizar-compra/order-received/99',
+			'callback_url'    => 'https://coremushroom.com.mx/wp-json/coremushroom/v1/payment-events',
 			'items'           => array(
 				array( 'name' => 'Chocolate de Hericium', 'sku' => 'HER-CHO', 'quantity' => 1, 'subtotal_minor' => 50000, 'total_minor' => 49000, 'tax_minor' => 0 ),
 				array( 'name' => 'Tisana de Ganoderma', 'sku' => 'GAN-TIS', 'quantity' => 2, 'subtotal_minor' => 40000, 'total_minor' => 40000, 'tax_minor' => 0 ),
 			),
 		);
-		$result = CACM_Session_Validator::validate( $payload, 'https://core.bancodeesporas.com', 2000000000 );
+		$result = CACM_Session_Validator::validate( $payload, 'https://coremushroom.com.mx', 2000000000 );
 
 		cacm_assert_true( is_array( $result ) );
 		cacm_assert_same( 90000, $result['amount_minor'] );
@@ -269,13 +269,13 @@ cacm_test(
 			'shipping_minor'  => 0,
 			'adjustments_minor' => 0,
 			'billing'         => array( 'first_name' => 'Ana', 'last_name' => 'López', 'email' => 'ana@example.test', 'phone' => '', 'country' => 'MX', 'state' => '', 'city' => '', 'postcode' => '', 'address_1' => '', 'address_2' => '' ),
-			'return_url'      => 'https://core.bancodeesporas.com/pago/resultado',
-			'callback_url'    => 'https://core.bancodeesporas.com/wp-json/coremushroom/v1/payment-events',
+			'return_url'      => 'https://coremushroom.com.mx/pago/resultado',
+			'callback_url'    => 'https://coremushroom.com.mx/wp-json/coremushroom/v1/payment-events',
 			'items'           => array(
 				array( 'name' => 'Chocolate de Hericium', 'sku' => '', 'quantity' => 1, 'subtotal_minor' => 89999, 'total_minor' => 89999, 'tax_minor' => 0 ),
 			),
 		);
-		$result = CACM_Session_Validator::validate( $payload, 'https://core.bancodeesporas.com', 2000000000 );
+		$result = CACM_Session_Validator::validate( $payload, 'https://coremushroom.com.mx', 2000000000 );
 
 		cacm_assert_true( is_wp_error( $result ) );
 		cacm_assert_same( 'cacm_amount_mismatch', $result->get_error_code() );
@@ -291,11 +291,11 @@ cacm_test(
 			'environment' => 'test', 'expires_at' => 2000003600,
 			'shipping_minor' => 0, 'adjustments_minor' => -10000,
 			'billing' => array( 'first_name' => 'Ana', 'last_name' => 'López', 'email' => 'ana@example.test', 'country' => 'MX' ),
-			'return_url' => 'https://core.bancodeesporas.com/finalizar-compra/order-received/101',
-			'callback_url' => 'https://core.bancodeesporas.com/wp-json/coremushroom/v1/payment-events',
+			'return_url' => 'https://coremushroom.com.mx/finalizar-compra/order-received/101',
+			'callback_url' => 'https://coremushroom.com.mx/wp-json/coremushroom/v1/payment-events',
 			'items' => array( array( 'name' => 'Chocolate de Hericium', 'sku' => '', 'quantity' => 1, 'subtotal_minor' => 100000, 'total_minor' => 100000, 'tax_minor' => 0 ) ),
 		);
-		$result = CACM_Session_Validator::validate( $payload, 'https://core.bancodeesporas.com', 2000000000 );
+		$result = CACM_Session_Validator::validate( $payload, 'https://coremushroom.com.mx', 2000000000 );
 		cacm_assert_true( is_array( $result ) );
 		cacm_assert_same( -10000, $result['adjustments_minor'] );
 	}
@@ -308,8 +308,8 @@ cacm_test(
 			public function get_meta( string $key, bool $single = true ) {
 				$meta = array(
 					'_cacm_bridge_session_hash' => hash( 'sha256', 'sesion' ),
-					'_cacm_return_url'          => 'https://core.bancodeesporas.com/pago/resultado',
-					'_cacm_origin'              => 'https://core.bancodeesporas.com',
+					'_cacm_return_url'          => 'https://coremushroom.com.mx/pago/resultado',
+					'_cacm_origin'              => 'https://coremushroom.com.mx',
 				);
 				return $meta[ $key ] ?? '';
 			}
@@ -319,7 +319,7 @@ cacm_test(
 		};
 
 		cacm_assert_same(
-			'https://core.bancodeesporas.com/pago/resultado',
+			'https://coremushroom.com.mx/pago/resultado',
 			CACM_Gateway_Restriction::filter_return_url( 'https://receiver.example/order-received', $order )
 		);
 	}

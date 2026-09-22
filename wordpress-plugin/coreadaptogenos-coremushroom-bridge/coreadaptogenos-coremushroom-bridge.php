@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CoreAdaptógenos · Puente CoreMushroom
  * Description: Recibe pedidos de CoreMushroom y los cobra con Stripe mediante WooCommerce.
- * Version: 0.2.0
+ * Version: 0.2.1
  * Requires at least: 6.7
  * Requires PHP: 8.1
  * Requires Plugins: woocommerce, woocommerce-gateway-stripe
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CACM_BRIDGE_VERSION', '0.2.0' );
+define( 'CACM_BRIDGE_VERSION', '0.2.1' );
 
 $cacm_files = array(
 	'includes/class-cacm-signature.php',

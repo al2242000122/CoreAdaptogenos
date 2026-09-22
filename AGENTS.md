@@ -2,6 +2,10 @@
 
 ## Puente de pago CoreMushroom
 
+- El origen canónico del escaparate es `https://coremushroom.com.mx`. El
+  antiguo subdominio `core.bancodeesporas.com` queda únicamente como redirección
+  permanente. El receptor debe validar el host canónico de forma exacta.
+
 - El WhatsApp Business público para ambas marcas es 220 644 6651. Enlaces
   internacionales: `https://wa.me/522206446651`. El frontend de muestra no
   debe activar pedidos por WhatsApp con productos ficticios; configura

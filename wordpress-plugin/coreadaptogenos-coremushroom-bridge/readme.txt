@@ -1,7 +1,7 @@
 === CoreAdaptógenos · Puente CoreMushroom ===
 Requires at least: 6.7
 Requires PHP: 8.1
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 
 Puente firmado entre dos instalaciones WooCommerce del mismo operador.
 
